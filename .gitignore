@@ -1,0 +1,70 @@
+# ==========================================
+# Internal docs (not for public repo)
+# ==========================================
+func_spec_v2.md
+cdk_infra.md
+
+# ==========================================
+# Python Core & Caches
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# ==========================================
+# Python Environments & Dependencies
+# ==========================================
+.venv/
+venv/
+ENV/
+env/
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# ==========================================
+# Docker & Containers
+# ==========================================
+.docker/
+# Ignore locally generated container data or databases if mapped locally
+data/
+db/
+*.db
+*.sqlite3
+
+# ==========================================
+# Secrets, Credentials & Environments
+# ==========================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ==========================================
+# Testing & Code Quality Tools
+# ==========================================
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+
+# ==========================================
+# IDEs & Editor Configuration
+# ==========================================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.DS_Store
+
+.claude/

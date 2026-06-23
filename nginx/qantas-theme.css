@@ -1,0 +1,757 @@
+/* ══════════════════════════════════════════════════════════════════════
+   QANTAS THEME — v2
+   Faithful to qantas.com: Figtree font, exact nav sizing, white surfaces,
+   scroll-reveal animations, bigger header.
+   Drop AFTER your existing <style> block or styles.css.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Figtree: closest open-source match to Qantas Ciutadella ──────── */
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+
+/* ── Design tokens ────────────────────────────────────────────────── */
+:root {
+  --qf-red:        #E8002D;
+  --qf-red-dk:     #C4001E;
+  --qf-red-tint:   #FEE8EC;
+  --qf-black:      #1A1A1A;   /* qantas.com body text */
+  --qf-grey-700:   #333333;
+  --qf-grey-500:   #666666;
+  --qf-grey-300:   #999999;
+  --qf-grey-100:   #F2F2F2;   /* page background for alt blocks */
+  --qf-rule:       #E5E5E5;
+  --qf-white:      #FFFFFF;
+  --qf-font:       'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Remap theme tokens so component CSS still works */
+  --bg:          var(--qf-white);
+  --surface:     var(--qf-white);
+  --surface2:    var(--qf-grey-100);
+  --surface3:    #E8E8E8;
+  --red:         var(--qf-red);
+  --red-dim:     var(--qf-red-tint);
+  --amber:       #F5A623;
+  --amber-dim:   #FEF4E0;
+  --green:       #007A4D;
+  --green-dim:   #E0F2EB;
+  --blue:        var(--qf-red);
+  --blue-dim:    var(--qf-red-tint);
+  --text:        var(--qf-black);
+  --text-muted:  var(--qf-grey-500);
+  --text-dim:    var(--qf-grey-300);
+  --border:      var(--qf-rule);
+  --border-lit:  #CCCCCC;
+  --mono:        var(--qf-font);
+  --sans:        var(--qf-font);
+  --radius:      4px;
+  --radius-lg:   6px;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--qf-white) !important;
+  color: var(--qf-black) !important;
+  font-family: var(--qf-font) !important;
+  font-size: 16px !important;      /* qantas.com base */
+  line-height: 1.5 !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV — tall, white, generous padding (matches qantas.com ~80px) ─ */
+nav {
+  position: fixed !important;
+  top: 0 !important; left: 0 !important; right: 0 !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: 80px !important;           /* ← taller header */
+  padding: 0 48px !important;        /* ← more horizontal breathing room */
+  background: var(--qf-white) !important;
+  border-bottom: 1px solid var(--qf-rule) !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+}
+
+/* Red left accent bar — Qantas nav signature */
+nav::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--qf-red);
+}
+
+/* ── Logo in nav ─────────────────────────────────────────────────── */
+.nav-brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  font-family: var(--qf-font) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: var(--qf-grey-500) !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+}
+
+.nav-brand img.qf-logo {
+  height: 36px !important;
+  width: auto !important;
+  display: block !important;
+}
+
+/* Separator between logo and page title */
+.nav-brand::after {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 24px;
+  background: var(--qf-rule);
+  margin: 0 2px;
+}
+
+/* ── Nav links — qantas.com style: 15px medium, hover underline ───── */
+.nav-links {
+  display: flex !important;
+  gap: 4px !important;
+  list-style: none !important;
+}
+
+.nav-links a {
+  font-family: var(--qf-font) !important;
+  font-size: 15px !important;      /* matches qantas.com nav text */
+  font-weight: 500 !important;
+  color: var(--qf-grey-700) !important;
+  text-decoration: none !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  padding: 8px 20px !important;
+  border-radius: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  transition: color 0.15s, border-color 0.15s !important;
+  background: transparent !important;
+}
+
+.nav-links a:hover {
+  color: var(--qf-red) !important;
+  background: transparent !important;
+  border-bottom-color: var(--qf-red) !important;
+}
+
+.nav-links a.active {
+  color: var(--qf-red) !important;
+  background: transparent !important;
+  border-bottom-color: var(--qf-red) !important;
+  font-weight: 600 !important;
+}
+
+/* ── Tab nav (inline section switcher in NBN version) ─────────────── */
+.tabs {
+  border: none !important;
+  border-radius: 0 !important;
+  width: auto !important;
+  gap: 0 !important;
+}
+
+.tab {
+  background: var(--qf-grey-100) !important;
+  border: 1px solid var(--qf-rule) !important;
+  border-radius: 4px !important;
+  font-family: var(--qf-font) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--qf-grey-700) !important;
+  transition: background 0.15s !important;
+}
+
+.tab.active {
+  background: var(--qf-red) !important;
+  border-color: var(--qf-red) !important;
+}
+
+.tab-num {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  color: var(--qf-grey-300) !important;
+}
+
+.tab-name {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: var(--qf-black) !important;
+}
+
+.tab.active .tab-num  { color: rgba(255,255,255,0.7) !important; }
+.tab.active .tab-name { color: #fff !important; }
+
+/* Chat toggle button */
+.chat-btn {
+  background: var(--qf-red-tint) !important;
+  border: 1px solid rgba(232,0,45,0.2) !important;
+  color: var(--qf-red) !important;
+  border-radius: 6px !important;
+}
+
+.chat-btn:hover, .chat-btn.open {
+  background: var(--qf-red) !important;
+  color: #fff !important;
+  border-color: var(--qf-red) !important;
+}
+
+/* ── Availability bar ─────────────────────────────────────────────── */
+.avail-bar {
+  top: 80px !important;   /* shift down to match new nav height */
+  background: #FFFBF0 !important;
+  border-bottom: 1px solid #F0E4B0 !important;
+  padding: 8px 48px !important;
+}
+
+.avail-bar span, .avail-bar a {
+  font-family: var(--qf-font) !important;
+  font-size: 13px !important;
+  color: #7A5C00 !important;
+  letter-spacing: 0 !important;
+}
+
+.avail-dot {
+  background: #F5A623 !important;
+}
+
+/* ── Sweep progress bar ──────────────────────────────────────────── */
+.sweep, #sweep {
+  top: 80px !important;
+  background: var(--qf-red) !important;
+  height: 3px !important;
+}
+
+/* ── Page & section offset ────────────────────────────────────────── */
+.page, .section {
+  background: var(--qf-white) !important;
+}
+
+/* Push page content down for taller nav */
+.page { padding-top: 80px !important; }
+#page-problem { padding-top: 80px !important; }
+#page-demo    { padding-top: 80px !important; }
+#page-about   { padding-top: 80px !important; }
+
+main { margin-top: 80px !important; }
+
+/* ── Hero ─────────────────────────────────────────────────────────── */
+.hero-section {
+  background: var(--qf-grey-100) !important;
+  border-bottom: 1px solid var(--qf-rule) !important;
+}
+
+.hero-eyebrow, .eyebrow {
+  font-family: var(--qf-font) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--qf-red) !important;
+  background: var(--qf-red-tint) !important;
+  border-radius: 2px !important;
+  padding: 3px 10px !important;
+}
+
+/* qantas.com h1: ~40-48px, weight 700 */
+.hero-title, .hero-text h1 {
+  font-family: var(--qf-font) !important;
+  font-size: clamp(28px, 3.5vw, 48px) !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  color: var(--qf-black) !important;
+  letter-spacing: -0.01em !important;
+}
+
+.hero-title em, .hero-text h1 em {
+  font-style: normal !important;
+  color: var(--qf-red) !important;
+}
+
+/* qantas.com body: 16px, #333 or #666 */
+.hero-body, .hero-text > p {
+  font-family: var(--qf-font) !important;
+  font-size: 16px !important;
+  color: var(--qf-grey-500) !important;
+  line-height: 1.65 !important;
+}
+
+/* ── Buttons — qantas.com style ──────────────────────────────────── */
+.btn-fill, .launch-btn,
+.chat-send {
+  font-family: var(--qf-font) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  background: var(--qf-red) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 12px 24px !important;
+  cursor: pointer !important;
+  transition: background 0.15s !important;
+}
+
+.btn-fill:hover, .launch-btn:hover { background: var(--qf-red-dk) !important; opacity: 1 !important; }
+
+.btn-out {
+  font-family: var(--qf-font) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  border: 2px solid var(--qf-red) !important;
+  color: var(--qf-red) !important;
+  background: transparent !important;
+  border-radius: 4px !important;
+}
+
+.btn-out:hover { background: var(--qf-red-tint) !important; }
+
+/* ── Stat values ──────────────────────────────────────────────────── */
+.stat { background: var(--qf-white) !important; }
+
+.stat-value, #sv1, #sv2, #sv3, #sv4 {
+  font-family: var(--qf-font) !important;
+  font-size: 40px !important;
+  font-weight: 800 !important;
+  color: var(--qf-red) !important;
+  line-height: 1 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.stat-label {
+  font-family: var(--qf-font) !important;
+  font-size: 13px !important;
+  color: var(--qf-grey-500) !important;
+  line-height: 1.45 !important;
+}
+
+/* ── Section headers ─────────────────────────────────────────────── */
+.section-header {
+  font-family: var(--qf-font) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--qf-grey-300) !important;
+  border-bottom: 1px solid var(--qf-rule) !important;
+  padding-bottom: 12px !important;
+  margin-bottom: 28px !important;
+}
+
+/* ── Cards — problem / policy ─────────────────────────────────────── */
+.problem-card {
+  background: var(--qf-white) !important;
+  padding: 28px 24px !important;
+}
+
+.problem-card-label {
+  font-family: var(--qf-font) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--qf-red) !important;
+}
+
+.problem-card h3 {
+  font-family: var(--qf-font) !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  color: var(--qf-black) !important;
+  margin-bottom: 10px !important;
+}
+
+.problem-card p {
+  font-family: var(--qf-font) !important;
+  font-size: 14px !important;
+  color: var(--qf-grey-500) !important;
+  line-height: 1.65 !important;
+}
+
+.policy-card {
+  background: var(--qf-white) !important;
+  border: 1px solid var(--qf-rule) !important;
+  border-top: 3px solid var(--qf-red) !important;
+  border-radius: 4px !important;
+}
+
+.policy-card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.09) !important;
+  background: var(--qf-white) !important;
+  border-top-color: var(--qf-red-dk) !important;
+}
+
+.policy-card-icon {
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1em !important;
+  color: var(--qf-red) !important;
+}
+
+.policy-card h4 {
+  font-family: var(--qf-font) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: var(--qf-black) !important;
+}
+
+.policy-card p {
+  font-family: var(--qf-font) !important;
+  font-size: 13px !important;
+  color: var(--qf-grey-500) !important;
+}
+
+.policy-card .arrow { color: var(--qf-red) !important; }
+
+/* ── Demo sidebar ─────────────────────────────────────────────────── */
+.sidebar {
+  background: var(--qf-grey-100) !important;
+  border-right: 1px solid var(--qf-rule) !important;
+}
+
+.sidebar-label {
+  font-family: var(--qf-font) !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: var(--qf-grey-300) !important;
+}
+
+.sidebar-section { border-bottom: 1px solid var(--qf-rule) !important; }
+
+.scenario-btn {
+  background: var(--qf-white) !important;
+  border: 1px solid var(--qf-rule) !important;
+  border-radius: 4px !important;
+  color: var(--qf-black) !important;
+}
+
+.scenario-btn:hover {
+  border-color: var(--qf-red) !important;
+  box-shadow: 0 2px 10px rgba(232,0,45,0.1) !important;
+  background: var(--qf-white) !important;
+}
+
+.scenario-btn.running  { border-color: #F5A623 !important; background: #FEF8EE !important; }
+.scenario-btn.complete { border-color: var(--green) !important; background: var(--green-dim) !important; }
+.scenario-btn.error    { border-color: var(--qf-red) !important; background: var(--qf-red-tint) !important; }
+
+.scenario-code  { font-size: 10px !important; font-weight: 800 !important; letter-spacing: 0.1em !important; color: var(--qf-red) !important; }
+.scenario-title { font-size: 13px !important; font-weight: 700 !important; color: var(--qf-black) !important; }
+.scenario-desc  { font-size: 11px !important; color: var(--qf-grey-500) !important; }
+
+.cost-meter { background: var(--qf-white) !important; border: 1px solid var(--qf-rule) !important; border-radius: 4px !important; }
+.cost-key   { font-size: 10px !important; font-weight: 700 !important; letter-spacing: 0.06em !important; color: var(--qf-grey-300) !important; text-transform: uppercase !important; }
+.cost-val   { font-size: 13px !important; font-weight: 800 !important; color: var(--qf-black) !important; }
+.cost-bar-track { background: var(--qf-rule) !important; }
+.cost-bar-fill  { background: var(--qf-red) !important; }
+.cost-bar-fill.danger { background: var(--qf-red-dk) !important; }
+
+/* ── Trace panel ──────────────────────────────────────────────────── */
+.trace-header, .resolution-header, .chat-header {
+  background: var(--qf-white) !important;
+  border-bottom: 1px solid var(--qf-rule) !important;
+}
+
+.trace-title, .panel-title, .chat-header-title {
+  font-family: var(--qf-font) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--qf-grey-500) !important;
+}
+
+.trace-body, .resolution-body, .demo-main { background: var(--qf-white) !important; }
+
+.trace-empty-text {
+  font-family: var(--qf-font) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  color: var(--qf-grey-300) !important;
+}
+
+.step-action {
+  font-family: var(--qf-font) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--qf-black) !important;
+}
+
+.step-detail  { font-size: 12px !important; color: var(--qf-grey-500) !important; }
+.step-cost    { font-size: 10px !important; color: var(--qf-grey-300) !important; }
+
+.step-agent { font-family: var(--qf-font) !important; font-size: 10px !important; font-weight: 800 !important; }
+.step-agent.fetcher      { background: rgba(232,0,45,0.08) !important; color: var(--qf-red) !important; }
+.step-agent.rebooking    { background: var(--green-dim) !important; color: var(--green) !important; }
+.step-agent.concierge    { background: #FEF3E0 !important; color: #9A6000 !important; }
+.step-agent.guardrail    { background: var(--qf-red-tint) !important; color: var(--qf-red) !important; }
+.step-agent.orchestrator { background: var(--qf-grey-100) !important; color: var(--qf-grey-500) !important; }
+
+.step-dot.fetcher   { background: var(--qf-red) !important; box-shadow: 0 0 6px rgba(232,0,45,0.35) !important; }
+.step-dot.rebooking { background: var(--green) !important; box-shadow: 0 0 6px rgba(0,122,77,0.35) !important; }
+.step-dot.concierge { background: #F5A623 !important; box-shadow: 0 0 6px rgba(245,166,35,0.4) !important; }
+.step-dot.guardrail { background: var(--qf-red) !important; box-shadow: 0 0 8px rgba(232,0,45,0.45) !important; }
+
+/* ── Resolutions ──────────────────────────────────────────────────── */
+.resolution-empty { font-family: var(--qf-font) !important; font-size: 11px !important; font-weight: 700 !important; letter-spacing: 0.06em !important; color: var(--qf-grey-300) !important; }
+.resolution-panel { background: var(--qf-white) !important; }
+.res-card { background: var(--qf-white) !important; border: 1px solid var(--qf-rule) !important; border-radius: 4px !important; }
+.res-card.human-review { border-color: #F5A623 !important; background: #FFFDF0 !important; }
+.res-card.resolved     { border-left: 3px solid var(--green) !important; }
+.res-card.budget-cap   { border-color: var(--qf-red) !important; background: var(--qf-red-tint) !important; }
+.res-pax               { font-size: 13px !important; font-weight: 700 !important; color: var(--qf-black) !important; }
+.res-detail-key        { font-family: var(--qf-font) !important; font-size: 9px !important; font-weight: 700 !important; letter-spacing: 0.06em !important; text-transform: uppercase !important; color: var(--qf-grey-300) !important; }
+.res-detail-val        { font-family: var(--qf-font) !important; font-size: 12px !important; font-weight: 600 !important; color: var(--qf-black) !important; }
+
+.res-badge, .status-badge { font-family: var(--qf-font) !important; font-weight: 800 !important; border-radius: 2px !important; }
+.badge-resolved  { background: var(--green-dim) !important; color: var(--green) !important; border: 1px solid rgba(0,122,77,0.25) !important; }
+.badge-review    { background: #FEF3E0 !important; color: #9A6000 !important; border: 1px solid rgba(245,166,35,0.35) !important; }
+.badge-guardrail { background: var(--qf-red-tint) !important; color: var(--qf-red) !important; border: 1px solid rgba(232,0,45,0.25) !important; }
+.badge-voucher   { background: var(--qf-red-tint) !important; color: var(--qf-red) !important; border: 1px solid rgba(232,0,45,0.25) !important; }
+.status-running  { background: #FEF3E0 !important; color: #9A6000 !important; }
+.status-complete { background: var(--green-dim) !important; color: var(--green) !important; }
+.status-error    { background: var(--qf-red-tint) !important; color: var(--qf-red) !important; }
+.status-idle     { background: var(--qf-grey-100) !important; color: var(--qf-grey-300) !important; }
+
+/* ── Chat ─────────────────────────────────────────────────────────── */
+.chat-outer { background: var(--qf-grey-100) !important; border-top: 1px solid var(--qf-rule) !important; }
+.chat-messages { background: var(--qf-grey-100) !important; }
+
+.chat-msg.user {
+  background: var(--qf-red) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px 10px 2px 10px !important;
+  font-family: var(--qf-font) !important;
+  font-size: 14px !important;
+}
+
+.chat-msg.assistant {
+  background: var(--qf-white) !important;
+  color: var(--qf-black) !important;
+  border: 1px solid var(--qf-rule) !important;
+  border-radius: 2px 10px 10px 10px !important;
+  font-family: var(--qf-font) !important;
+  font-size: 14px !important;
+}
+
+.chat-msg.guardrail {
+  background: var(--qf-red-tint) !important;
+  border: 1px solid rgba(232,0,45,0.25) !important;
+  color: var(--qf-red) !important;
+  font-family: var(--qf-font) !important;
+  font-size: 12px !important;
+}
+
+.chat-input {
+  font-family: var(--qf-font) !important;
+  font-size: 14px !important;
+  background: var(--qf-white) !important;
+  border: 1px solid var(--qf-rule) !important;
+  color: var(--qf-black) !important;
+  border-radius: 4px !important;
+}
+
+.chat-input:focus { border-color: var(--qf-red) !important; outline: none !important; }
+
+.chat-pnr {
+  font-family: var(--qf-font) !important;
+  font-size: 14px !important;
+  background: var(--qf-white) !important;
+  border: 1px solid var(--qf-rule) !important;
+  color: var(--qf-black) !important;
+  border-radius: 4px !important;
+}
+
+.chat-send {
+  font-size: 13px !important;
+  padding: 8px 16px !important;
+  letter-spacing: 0.03em !important;
+}
+
+.chat-send:hover    { background: var(--qf-red-dk) !important; }
+.chat-send:disabled { background: var(--qf-rule) !important; color: var(--qf-grey-300) !important; cursor: not-allowed !important; }
+.chat-guardrail-note { font-family: var(--qf-font) !important; font-size: 10px !important; font-weight: 700 !important; letter-spacing: 0.06em !important; text-transform: uppercase !important; color: var(--qf-grey-300) !important; }
+
+/* ── Right sidebar chat (NBN/strategy page) ──────────────────────── */
+.sb-head  { background: var(--qf-red) !important; }
+.sb-title { font-family: var(--qf-font) !important; font-size: 15px !important; font-weight: 700 !important; }
+.sb-sub   { font-family: var(--qf-font) !important; font-size: 12px !important; }
+
+.sb-chip {
+  background: var(--qf-white) !important;
+  border: 1px solid var(--qf-rule) !important;
+  border-radius: 4px !important;
+  color: var(--qf-red) !important;
+  font-family: var(--qf-font) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+.sb-chip:hover { border-color: var(--qf-red) !important; background: var(--qf-red-tint) !important; }
+
+.msg-a {
+  background: var(--qf-white) !important;
+  color: var(--qf-black) !important;
+  font-family: var(--qf-font) !important;
+  font-size: 13px !important;
+  border-radius: 2px 10px 10px 10px !important;
+  border: 1px solid var(--qf-rule) !important;
+}
+
+.msg-u {
+  background: var(--qf-red) !important;
+  color: #fff !important;
+  font-family: var(--qf-font) !important;
+  font-size: 13px !important;
+  border-radius: 10px 10px 2px 10px !important;
+}
+
+.typing span { background: var(--qf-grey-300) !important; }
+.sb-inp button { color: var(--qf-red) !important; }
+
+/* ── About page ──────────────────────────────────────────────────── */
+.about-left h2 {
+  font-family: var(--qf-font) !important;
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  color: var(--qf-black) !important;
+  letter-spacing: -0.01em !important;
+}
+
+.about-left .role {
+  font-family: var(--qf-font) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: var(--qf-red) !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+}
+
+.about-left p  { font-family: var(--qf-font) !important; font-size: 15px !important; color: var(--qf-grey-500) !important; line-height: 1.75 !important; }
+.about-right h3 { font-family: var(--qf-font) !important; font-size: 10px !important; font-weight: 800 !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; color: var(--qf-grey-300) !important; border-bottom: 1px solid var(--qf-rule) !important; }
+
+.skill-list li         { font-family: var(--qf-font) !important; font-size: 14px !important; color: var(--qf-grey-700) !important; border-bottom: 1px solid var(--qf-rule) !important; }
+.skill-list li::before { color: var(--qf-red) !important; }
+.skill-fill { background: var(--qf-red) !important; }
+.contact-link { font-family: var(--qf-font) !important; font-weight: 600 !important; color: var(--qf-red) !important; }
+.contact-link:hover { color: var(--qf-red-dk) !important; }
+.contact-link span { color: var(--qf-grey-300) !important; }
+
+.avatar    { background: var(--qf-red) !important; }
+.about-name { font-weight: 700 !important; color: var(--qf-black) !important; }
+.about-role { color: var(--qf-red) !important; font-weight: 600 !important; }
+.why-box    { border-left-color: var(--qf-red) !important; background: var(--qf-red-tint) !important; }
+.exp-company { color: var(--qf-red) !important; }
+.cv-yr       { color: var(--qf-red) !important; }
+.cv-contact-item a { color: var(--qf-red) !important; }
+
+/* ── Architecture diagram ─────────────────────────────────────────── */
+.arch-diagram {
+  font-family: 'Figtree', monospace, sans-serif !important;
+  font-size: 11px !important;
+  color: var(--qf-grey-500) !important;
+  background: var(--qf-grey-100) !important;
+  border: 1px solid var(--qf-rule) !important;
+  border-radius: 4px !important;
+  padding: 12px !important;
+}
+
+.arch-diagram .hl-red   { color: var(--qf-red) !important; }
+.arch-diagram .hl-amber { color: #9A6000 !important; }
+.arch-diagram .hl-green { color: var(--green) !important; }
+.arch-diagram .hl-blue  { color: var(--qf-red) !important; }
+
+/* ── Map toast ────────────────────────────────────────────────────── */
+.map-toast {
+  background: var(--qf-black) !important;
+  color: #fff !important;
+  border: none !important;
+  font-family: var(--qf-font) !important;
+  font-size: 12px !important;
+}
+
+/* ── Demo hero dark strip ─────────────────────────────────────────── */
+.demo-hero { background: var(--qf-black) !important; }
+.demo-card-head { border-top: 3px solid var(--qf-red) !important; }
+
+/* ── Phase / roadmap ──────────────────────────────────────────────── */
+.phase.now .phase-lbl { color: var(--qf-red) !important; }
+.phase.now { background: var(--qf-red-tint) !important; border-color: rgba(232,0,45,0.2) !important; }
+
+/* ── Global link colour ───────────────────────────────────────────── */
+a { color: var(--qf-red); text-decoration: none; }
+a:hover { color: var(--qf-red-dk); }
+
+/* ── Scrollbars ───────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--qf-grey-100); }
+::-webkit-scrollbar-thumb { background: var(--qf-rule); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--qf-grey-300); }
+
+/* ══════════════════════════════════════════════════════════════════════
+   SCROLL-REVEAL ANIMATIONS
+   Elements with .qf-reveal fade/slide up on scroll.
+   Applied via qantas-theme.js IntersectionObserver.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Initial hidden state */
+.qf-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Staggered children */
+.qf-reveal.delay-1 { transition-delay: 0.08s; }
+.qf-reveal.delay-2 { transition-delay: 0.16s; }
+.qf-reveal.delay-3 { transition-delay: 0.24s; }
+.qf-reveal.delay-4 { transition-delay: 0.32s; }
+
+/* Visible state — added by JS */
+.qf-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Stat number count-up highlight flash */
+@keyframes qf-flash {
+  0%   { color: var(--qf-red); }
+  50%  { color: var(--qf-red-dk); }
+  100% { color: var(--qf-red); }
+}
+
+.qf-count-flash { animation: qf-flash 0.6s ease; }
+
+/* Reduced motion: skip all transitions */
+@media (prefers-reduced-motion: reduce) {
+  .qf-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ── Duotone stripe blush — Problem, Architect, About heroes ── */
+.hero-section,
+.hero {
+  background: linear-gradient(180deg, rgba(232,0,45,0.06) 0%, rgba(232,0,45,0.02) 40%, transparent 100%) !important;
+}
+
+.arch-hero {
+  background: linear-gradient(180deg, rgba(232,0,45,0.06) 0%, rgba(232,0,45,0.02) 40%, transparent 100%) !important;
+}
+
+.about-layout,
+#page-about {
+  background: var(--qf-white) !important;
+}

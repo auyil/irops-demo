@@ -1,0 +1,16 @@
+# Web framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+
+# AWS SDK — Bedrock model invocation + Guardrails
+boto3>=1.35.0
+
+# Strands agent framework (AWS open-source)
+strands-agents>=0.1.0
+strands-agents-tools>=0.1.0
+
+# Data validation
+pydantic>=2.0.0
+
+# Async support (included with uvicorn[standard] but explicit for clarity)
+anyio>=4.0.0

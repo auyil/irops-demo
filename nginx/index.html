@@ -1,0 +1,3395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IROPS Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & tokens ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #0A0F1E;
+  --surface:     #111827;
+  --surface2:    #1A2340;
+  --surface3:    #212D45;
+  --red:         #E8002D;
+  --red-dim:     rgba(232,0,45,0.15);
+  --amber:       #C8A84B;
+  --amber-dim:   rgba(200,168,75,0.15);
+  --green:       #2ECC71;
+  --green-dim:   rgba(46,204,113,0.12);
+  --blue:        #4A9EFF;
+  --blue-dim:    rgba(74,158,255,0.12);
+  --text:        #E8F4FD;
+  --text-muted:  #7B8FAE;
+  --text-dim:    #4A5568;
+  --border:      rgba(255,255,255,0.07);
+  --border-lit:  rgba(255,255,255,0.14);
+  --mono:        'JetBrains Mono', monospace;
+  --sans:        'Inter', sans-serif;
+  --radius:      6px;
+  --radius-lg:   10px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── Nav ─────────────────────────────────────────────────────────── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 56px;
+  background: rgba(10,15,30,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-brand {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--red);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nav-links {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 0.15s, background 0.15s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--text);
+  background: var(--surface2);
+}
+
+/* ── Availability notice ─────────────────────────────────────────── */
+.avail-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+  flex-shrink: 0;
+}
+
+.avail-bar.online {
+  background: #f0fdf4 !important;
+  border-top-color: #bbf7d0 !important;
+}
+
+.avail-bar span {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+
+.avail-bar.online span {
+  color: #16a34a !important;
+}
+
+.avail-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.avail-bar.online .avail-dot {
+  background: #16a34a !important;
+  animation: pulse-green 2s ease-in-out infinite;
+}
+
+@keyframes pulse-green {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+/* ── Page sections ───────────────────────────────────────────────── */
+.page { display: none; padding-top: 90px; min-height: 100vh; }
+.page.active { display: block; }
+
+
+.hero {
+  padding: 72px 40px 60px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(232,0,45,0.04) 0%, transparent 100%);
+}
+
+.hero-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+}
+
+.hero-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-image {
+  flex-shrink: 0;
+  width: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.hero-image img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  opacity: 0.92;
+  animation: fade-up 0.5s ease-out;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.hero-title {
+  font-family: var(--mono);
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+.hero-title em {
+  font-style: normal;
+  color: var(--red);
+}
+
+.hero-body {
+  font-size: 16px;
+  color: var(--text-muted);
+  max-width: 640px;
+  line-height: 1.75;
+}
+
+
+.impact-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  max-width: 680px;
+}
+
+.stat {
+  background: var(--surface);
+  padding: 28px 24px;
+}
+
+.stat-value {
+  font-family: var(--mono);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--red);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Problem framing */
+.problem-section {
+  padding: 60px 40px;
+}
+
+.problem-section-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.section-header {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.problem-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 60px;
+}
+
+.problem-card {
+  background: var(--surface);
+  padding: 32px 28px;
+}
+
+.problem-card-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--red);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.problem-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+
+.problem-card p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+/* Policy reference cards */
+.policy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.policy-card {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+  cursor: pointer;
+}
+
+.policy-card:hover {
+  border-color: var(--border-lit);
+  background: var(--surface2);
+}
+
+.policy-card-icon {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.policy-card h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.policy-card p {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.policy-card .arrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--blue);
+  margin-top: 14px;
+  display: block;
+}
+
+/* ── Page 2: The Solution ────────────────────────────────────────── */
+#page-demo {
+  padding: 90px 0 0;
+}
+#page-demo * {
+  animation: none !important;
+}
+#page-demo .step-dot.running {
+  animation: dot-pulse 1s ease-in-out infinite !important;
+}
+#page-demo .thinking-dots span {
+  animation: dot-flash 1.2s ease-in-out infinite !important;
+}
+#page-demo .thinking-dots span:nth-child(2) { animation-delay: 0.2s !important; }
+#page-demo .thinking-dots span:nth-child(3) { animation-delay: 0.4s !important; }
+#page-demo .avail-dot {
+  animation: pulse-green 2s ease-in-out infinite !important;
+}
+
+.demo-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  grid-template-rows: 1fr 1fr;
+  height: calc(100vh - 90px);
+  overflow: hidden;
+}
+
+/* Left sidebar */
+.sidebar {
+  grid-row: 1 / 3;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+/* Architecture diagram */
+.arch-diagram {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.arch-diagram .hl-red    { color: var(--red); }
+.arch-diagram .hl-amber  { color: var(--amber); }
+.arch-diagram .hl-green  { color: var(--green); }
+.arch-diagram .hl-blue   { color: var(--blue); }
+
+/* Scenario buttons */
+.scenario-btn {
+  width: 100%;
+  text-align: left;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  color: var(--text);
+}
+
+.scenario-btn:hover { border-color: var(--border-lit); background: var(--surface3); }
+.scenario-btn:last-child { margin-bottom: 0; }
+
+.scenario-btn.running {
+  border-color: var(--amber);
+  background: var(--amber-dim);
+}
+
+.scenario-btn.complete {
+  border-color: var(--green);
+  background: var(--green-dim);
+}
+
+.scenario-btn.error {
+  border-color: var(--red);
+  background: var(--red-dim);
+}
+
+.scenario-btn.custom-active {
+  border-color: var(--blue);
+  background: var(--blue-dim);
+}
+
+.scenario-code {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--red);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.scenario-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  line-height: 1.3;
+  font-family: var(--mono);
+  letter-spacing: 0.03em;
+}
+
+.scenario-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* Cost meter */
+.cost-meter {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+.cost-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.cost-row:last-child { margin-bottom: 0; }
+
+.cost-key {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.cost-val {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--amber);
+}
+
+.cost-bar-track {
+  height: 3px;
+  background: var(--surface3);
+  border-radius: 2px;
+  margin-top: 10px;
+}
+
+.cost-bar-fill {
+  height: 3px;
+  background: var(--amber);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.5s ease, background 0.3s;
+}
+
+.cost-bar-fill.danger { background: var(--red); }
+
+/* Right-panel collapsible sections (Live Usage + Past Runs) */
+.rp-section {
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.rp-section > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.rp-section > summary::-webkit-details-marker { display: none; }
+
+.rp-section > summary::after {
+  content: '▸';
+  font-size: 9px;
+  color: var(--text-dim);
+  transition: transform 0.15s;
+}
+
+.rp-section[open] > summary::after { transform: rotate(90deg); }
+
+.rp-section-body {
+  padding: 0 12px 12px;
+}
+
+/* Live Usage meter inside right panel */
+.usage-meter {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+
+.usage-clock {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--blue);
+  text-align: center;
+  letter-spacing: 0.04em;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* History cards */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.history-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.history-card:hover { border-color: var(--border-lit); background: var(--surface3); }
+
+.history-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.history-scn-badge {
+  color: var(--red);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.history-status {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.history-status.complete  { color: var(--green); background: var(--green-dim); }
+.history-status.review    { color: var(--amber); background: var(--amber-dim); }
+.history-status.error     { color: var(--red);   background: var(--red-dim); }
+
+.history-card-meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.history-empty {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  text-align: center;
+  padding: 12px 0;
+}
+
+/* Centre panel — workflow trace */
+.trace-panel {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.trace-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.trace-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.workflow-id-display {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.trace-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.trace-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 12px;
+  color: var(--text-dim);
+}
+
+.trace-empty-icon {
+  font-family: var(--mono);
+  font-size: 28px;
+  opacity: 0.3;
+}
+
+.trace-empty-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+/* Trace steps */
+.trace-step {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+@keyframes step-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.step-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  padding-top: 3px;
+  min-width: 24px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.step-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.step-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.step-dot.fetcher   { background: var(--blue); box-shadow: 0 0 6px var(--blue); }
+.step-dot.rebooking { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.step-dot.concierge { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+.step-dot.guardrail { background: var(--red); box-shadow: 0 0 8px var(--red); }
+.step-dot.running   { animation: dot-pulse 1s ease-in-out infinite; }
+
+@keyframes dot-pulse {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.4); opacity: 0.6; }
+}
+
+.step-line {
+  width: 1px;
+  flex: 1;
+  background: var(--border);
+  margin: 3px 0;
+  min-height: 8px;
+}
+
+.step-content {
+  flex: 1;
+  padding-bottom: 12px;
+}
+
+.step-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.step-agent {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.step-agent.fetcher   { background: var(--blue-dim);  color: var(--blue); }
+.step-agent.rebooking { background: var(--green-dim); color: var(--green); }
+.step-agent.concierge { background: var(--amber-dim); color: var(--amber); }
+.step-agent.guardrail { background: var(--red-dim);   color: var(--red); }
+.step-agent.orchestrator { background: rgba(255,255,255,0.06); color: var(--text-muted); }
+
+.step-action {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text);
+}
+
+.step-time {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+.step-summary {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.55;
+  margin-bottom: 3px;
+}
+
+.step-detail {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+.step-cost {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 3px;
+}
+
+/* Guardrail step */
+.trace-step.guardrail-halt .step-content {
+  background: var(--red-dim);
+  border: 1px solid rgba(232,0,45,0.3);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.trace-step.guardrail-blocked .step-content {
+  background: var(--amber-dim);
+  border: 1px solid rgba(200,168,75,0.3);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+/* Right panel — resolution table */
+.resolution-panel {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.resolution-header {
+  padding: 16px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.resolution-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.resolution-body {
+  flex: 1 0 auto;
+  padding: 10px;
+}
+
+.resolution-empty {
+  padding: 40px 16px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+
+.res-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.res-card.human-review {
+  border-color: rgba(200,168,75,0.4);
+  background: var(--amber-dim);
+}
+
+.res-card.resolved {
+  border-color: rgba(46,204,113,0.3);
+}
+
+.res-card.budget-cap {
+  border-color: rgba(232,0,45,0.3);
+  background: var(--red-dim);
+}
+
+.res-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.res-pax {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.res-tier {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tier-Platinum { background: rgba(192,192,192,0.15); color: #C0C0C0; }
+.tier-Gold     { background: rgba(200,168,75,0.2);  color: var(--amber); }
+.tier-Silver   { background: rgba(160,174,192,0.15); color: #A0AEC0; }
+.tier-Bronze   { background: rgba(150,90,60,0.2);   color: #CD7F53; }
+.tier-None     { background: rgba(255,255,255,0.05); color: var(--text-dim); }
+
+.res-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 8px;
+}
+
+.res-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.res-detail-key {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.res-detail-val {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.res-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.badge-resolved  { background: var(--green-dim);  color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
+.badge-review    { background: var(--amber-dim);  color: var(--amber); border: 1px solid rgba(200,168,75,0.3); }
+.badge-guardrail { background: var(--red-dim);    color: var(--red);   border: 1px solid rgba(232,0,45,0.3); }
+.badge-voucher   { background: var(--blue-dim);   color: var(--blue);  border: 1px solid rgba(74,158,255,0.3); }
+
+.demo-main {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+
+.chat-outer {
+  grid-column: 2;
+  grid-row: 2;
+  border-top: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  transition: border-top-color 0.2s;
+}
+
+.chat-title-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+.chat-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+
+.chat-guardrail-note {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+.chat-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Sample question chips */
+.sample-questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 6px 16px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+}
+
+.sample-q {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+  line-height: 1.4;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sample-q:hover {
+  color: var(--text);
+  border-color: var(--border-lit);
+  background: var(--surface3);
+}
+
+/* Thinking/waiting dots */
+@keyframes dot-flash {
+  0%, 80%, 100% { opacity: 0.2; transform: scale(0.85); }
+  40%            { opacity: 1;   transform: scale(1); }
+}
+
+.thinking-dots {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding: 2px 0;
+}
+
+.thinking-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  animation: dot-flash 1.2s ease-in-out infinite;
+}
+
+.thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+.chat-msg {
+  max-width: 80%;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.chat-msg.user {
+  align-self: flex-end;
+  background: var(--surface3);
+  color: var(--text);
+  border: 1px solid var(--border-lit);
+}
+
+.chat-msg.assistant {
+  align-self: flex-start;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.chat-msg.guardrail {
+  align-self: flex-start;
+  background: var(--red-dim);
+  border: 1px solid rgba(232,0,45,0.3);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--red);
+}
+
+.chat-msg.guardrail-topic {
+  align-self: flex-start;
+  background: var(--amber-dim);
+  border: 1px solid rgba(200,168,75,0.3);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--amber);
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  flex-shrink: 0;
+}
+
+
+.chat-input {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.chat-input:focus { border-color: var(--border-lit); }
+.chat-input::placeholder { color: var(--text-dim); }
+
+.chat-send {
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 8px 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.chat-send:hover   { background: #c8001f; }
+.chat-send:disabled { background: var(--surface3); color: var(--text-dim); cursor: not-allowed; }
+
+/* ── Page 3: About ───────────────────────────────────────────────── */
+#page-about {
+  padding-top: 90px;
+}
+
+.about-layout {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 60px 40px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.about-left h2 {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.about-left .role {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.about-left p {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.75;
+  margin-bottom: 16px;
+}
+
+.about-right h3 {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.skill-list {
+  list-style: none;
+  margin-bottom: 32px;
+}
+
+.skill-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.skill-list li::before {
+  content: "▸";
+  color: var(--text-dim);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contact-link {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--blue);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.15s;
+}
+
+.contact-link:hover { color: var(--text); }
+
+.contact-link span {
+  color: var(--text-dim);
+  font-size: 10px;
+  min-width: 70px;
+}
+
+/* ── About page — experience timeline ───────────────────────────── */
+.about-section-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 32px 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.exp-item {
+  margin-bottom: 28px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.exp-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.exp-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  margin-bottom: 10px;
+}
+
+.exp-period {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.exp-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.exp-company {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.exp-story {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.edu-year {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Utilities ───────────────────────────────────────────────────── */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.status-running  { background: var(--amber-dim); color: var(--amber); }
+.status-complete { background: var(--green-dim); color: var(--green); }
+.status-error    { background: var(--red-dim);   color: var(--red); }
+.status-idle     { background: rgba(255,255,255,0.04); color: var(--text-dim); }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+<link rel="stylesheet" href="qantas-theme.css">
+<script src="qantas-theme.js" defer></script>
+</head>
+<body>
+
+<!-- ── Nav ─────────────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-brand">Senior Manager Applied AI Demo Project</div>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('problem')" id="nav-problem" class="active">The challenge</a></li>
+    <li><a href="#" onclick="showPage('arch')" id="nav-arch">How it works</a></li>
+    <li><a href="#" onclick="showPage('demo')"    id="nav-demo">See it in action</a></li>
+    <li><a href="#" onclick="showPage('about')"   id="nav-about">Meet Yifei</a></li>
+  </ul>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PAGE 1 — THE PROBLEM
+════════════════════════════════════════════════════════════════════ -->
+<section class="page active" id="page-problem">
+
+  <div class="arch-hero">
+    <div class="arch-hero-inner" style="display:flex;align-items:center;gap:60px;">
+      <div style="flex:1;min-width:0;">
+        <div class="arch-eyebrow">Challenge &amp; Opportunities</div>
+        <h1 class="hero-title"><em>Irregular operations</em> are inevitable;<br>their impact is not.</h1>
+        <p class="hero-body">
+          Irregular Operations (IROPS) — storms, mechanical faults, ATC restrictions — trigger
+          cascading passenger disruptions that require rapid, complex decision-making. This prototype
+          demonstrates how autonomous AI agents can resolve these events in seconds, not hours,
+          within strict regulatory and safety guardrails.
+        </p>
+      </div>
+      <div class="hero-image">
+        <img src="/qantas-plane-tail-kangaroo-flight-travel-credit-airline.avif" alt="Qantas aircraft tail" />
+      </div>
+    </div>
+  </div>
+
+  <div class="problem-section">
+    <div class="problem-section-inner">
+
+    <div class="section-header">WHY THIS USE CASE</div>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-card-label">The Trigger</div>
+        <h3>The Ripple Effect</h3>
+        <p>A single cancelled flight doesn't just disrupt one passenger — it cascades through connecting flights, crew legality windows, gate allocations, and catering chains. Hub-and-spoke networks amplify every failure.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-card-label">The Constraint</div>
+        <h3>Operational Complexity</h3>
+        <p>Every rebooking decision must respect IATA delay codes, Australian Consumer Law refund rights, loyalty tier priority rules, and strict SSR safety protocols — simultaneously, at scale, in real time.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-card-label">The Opportunity</div>
+        <h3>Multi-Agent Orchestration</h3>
+        <p>The problem decomposes naturally into specialist agents: one fetches data, one executes rebooking logic, one handles customer communication. Each has a bounded silo and explicit guardrails.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-card-label">The Architecture Signal</div>
+        <h3>Skill Libraries + Governance</h3>
+        <p>Policy lookup, IATA code classification, and SSR safety checking are reusable skills — not hardcoded logic. Model selection, token budgets, and temperature controls are explicit governance artefacts.</p>
+      </div>
+    </div>
+
+    <div class="section-header">REFERENCE POLICY DOCUMENTS</div>
+
+    <div class="policy-grid">
+      <a class="policy-card" href="https://www.qantas.com/en-au/book/flights/compensation-and-refunds-policy" target="_blank" rel="noopener">
+        <div class="policy-card-icon">QF-COMP</div>
+        <h4>Qantas Compensation & Refunds Policy</h4>
+        <p>Defines passenger entitlements for controllable delays, cancellations, and overnight stays. Drives the voucher issuance logic in this prototype.</p>
+        <span class="arrow">→ qantas.com</span>
+      </a>
+      <a class="policy-card" href="https://www.qantas.com/en-vu/book/flights/conditions-of-carriage" target="_blank" rel="noopener">
+        <div class="policy-card-icon">QF-COC</div>
+        <h4>Qantas Conditions of Carriage</h4>
+        <p>The contractual framework governing rebooking obligations, refund rights, and liability limits. Referenced in agent justification outputs.</p>
+        <span class="arrow">→ qantas.com</span>
+      </a>
+      <a class="policy-card" href="https://www.accc.gov.au/consumers/specific-products-and-activities/travel-delays-and-cancellations" target="_blank" rel="noopener">
+        <div class="policy-card-icon">ACCC</div>
+        <h4>ACCC Travel Delays & Cancellations</h4>
+        <p>Australian Consumer Law rights for air travel disruptions, including the 72-hour alternate flight rule triggering mandatory cash refunds.</p>
+        <span class="arrow">→ accc.gov.au</span>
+      </a>
+    </div>
+
+    </div>
+  </div>
+
+</section>
+<!-- ═══════════════════════════════════════════════════════════════════
+     PAGE: THE ARCHITECT
+     Insert this as a new <section> in index.html, between
+     page-problem and page-demo. Add "The Architect" to nav-links.
+════════════════════════════════════════════════════════════════════ -->
+
+<!-- Add this to nav-links in the <nav> block: -->
+<!--
+<li><a href="#" onclick="showPage('arch')" id="nav-arch">The Architect</a></li>
+-->
+
+<!-- ── Architecture Page ──────────────────────────────────────────── -->
+<section class="page" id="page-arch">
+<div class="arch-page">
+
+  <!-- ── Hero ──────────────────────────────────────────────────────── -->
+  <div class="arch-hero">
+    <div class="arch-hero-inner" style="display:flex;align-items:center;gap:60px;">
+      <div style="flex:1;min-width:0;">
+        <div class="arch-eyebrow">System Design</div>
+        <h2 class="arch-h2">Built for the <em>real constraints</em><br>of enterprise AI.</h2>
+        <p class="arch-lead">
+          This prototype is not only a proof of concept — it is a reference architecture.
+          Every design decision reflects how AI should be deployed in a regulated,
+          safety-critical, customer-facing environment: with explicit governance,
+          observable behaviour, and the kind of guardrail layering that lets product
+          teams move fast without breaking trust.
+        </p>
+      </div>
+      <div style="flex-shrink:0;width:340px;display:flex;justify-content:flex-end;">
+        <img src="/a380-runway-tarmac.avif" alt="A380 on runway" style="width:100%;height:auto;border-radius:var(--radius-lg);opacity:0.92;animation:fade-up 0.5s ease-out;" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Three pillars ─────────────────────────────────────────────── -->
+  <div class="arch-section">
+    <div class="arch-section-inner">
+      <div class="arch-section-label">Design Philosophy</div>
+      <div class="pillar-grid">
+        <div class="pillar-card">
+          <div class="problem-card-label">The Guardrail</div>
+          <h3>Standards &amp; Governance</h3>
+          <p>Every AI decision is constrained, logged, and explainable. Model selection, token budgets, temperature settings, and safety rules are defined in a single governance configuration — not scattered across code. The system cannot spend more than it's allowed to, and it cannot take actions it hasn't been authorised for.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="problem-card-label">The Pattern</div>
+          <h3>Builder Infrastructure</h3>
+          <p>The architecture is modular by design. Agents own clearly bounded silos. Skills are reusable across agents. The orchestrator coordinates without doing data work. This is a reference pattern product teams can adopt, not a one-off script — swap the database connection string and it runs on Redshift in production.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="problem-card-label">The Domain</div>
+          <h3>Domain Expertise as Code</h3>
+          <p>Aviation regulatory constraints — IATA delay codes, ACL consumer rights, SSR safety protocols, tier priority rules — are not buried in prompts. They are explicit technical artefacts: guardrail hooks, skill libraries, and semantic layers that encode domain knowledge in a form that can be audited, tested, and updated independently of the model.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Agent architecture ─────────────────────────────────────────── -->
+  <div class="arch-section arch-section-alt">
+    <div class="arch-section-inner">
+      <div class="arch-section-label">Agent Architecture</div>
+      <div class="arch-two-col">
+        <div class="arch-col-text">
+          <h3 class="arch-h3">Four agents. Two workflows. One governance model.</h3>
+          <p>The system separates concerns at the agent level. The Orchestrator routes and coordinates — it never touches data. The Fetcher owns all reads. The Rebooking agent owns all writes. The Concierge handles all customer interaction. Each agent has its own model, system prompt, and tool set, and can be tested, replaced, or upgraded independently.</p>
+          <p>This is the subagent pattern in practice: silo the work, not just the prompts.</p>
+
+          <div class="agent-table">
+            <div class="agent-row agent-row-header">
+              <span>Agent</span><span>Model</span><span>Responsibility</span>
+            </div>
+            <div class="agent-row">
+              <span class="agent-name orc">Orchestrator</span>
+              <span class="agent-model">Haiku 4.5</span>
+              <span class="agent-role">Routes disruption trigger → Fetcher → Rebooking sequentially. No data access.</span>
+            </div>
+            <div class="agent-row">
+              <span class="agent-name fch">Fetcher</span>
+              <span class="agent-model">Nova Lite</span>
+              <span class="agent-role">All database reads. Returns tier-ranked passenger manifest and inventory.</span>
+            </div>
+            <div class="agent-row">
+              <span class="agent-name rbk">Rebooking</span>
+              <span class="agent-model">Nova Lite</span>
+              <span class="agent-role">All write operations. Rebooks flights, issues vouchers, updates audit log.</span>
+            </div>
+            <div class="agent-row">
+              <span class="agent-name con">Concierge</span>
+              <span class="agent-model">Nova Lite</span>
+              <span class="agent-role">Customer-facing chat. PNR lookup, policy explanation, human escalation.</span>
+            </div>
+          </div>
+
+          <div class="arch-note">
+            <span class="arch-note-label">Model Selection Rationale</span>
+            Haiku 4.5 for the orchestrator — proven tool-use reliability at lowest cost for a pure routing task.
+            Nova Lite for all subagents — strong tool-use reliability at ~10× lower cost than Nova Lite,
+            appropriate for structured data operations and policy-grounded reasoning with bounded prompts.
+          </div>
+        </div>
+
+        <div class="arch-col-diagram">
+          <div class="flow-diagram">
+            <div class="flow-trigger">
+              <div class="flow-label">IROPS EVENT</div>
+              <div class="flow-sub">Flight disruption detected</div>
+            </div>
+            <div class="flow-arrow-down">↓</div>
+            <div class="flow-node flow-orc">
+              <div class="flow-node-tag">ORCHESTRATOR</div>
+              <div class="flow-node-name">Claude Haiku 4.5</div>
+              <div class="flow-node-role">Coordinator · No data access</div>
+            </div>
+            <div class="flow-branch">
+              <div class="flow-branch-line"></div>
+              <div class="flow-branch-nodes">
+                <div class="flow-branch-item">
+                  <div class="flow-arrow-down" style="color:var(--blue)">↓</div>
+                  <div class="flow-node flow-fch">
+                    <div class="flow-node-tag">FETCHER</div>
+                    <div class="flow-node-name">Nova Lite</div>
+                    <div class="flow-node-tools">query_passengers<br>query_inventory<br>query_flight_status</div>
+                  </div>
+                  <div class="flow-arrow-down" style="color:var(--blue)">↓</div>
+                  <div class="flow-node flow-rbk">
+                    <div class="flow-node-tag">REBOOKING</div>
+                    <div class="flow-node-name">Nova Lite</div>
+                    <div class="flow-node-tools">rebook_flight<br>issue_voucher<br>update_irops_log</div>
+                  </div>
+                </div>
+                <div class="flow-branch-item" style="border-left:1px dashed rgba(200,168,75,0.3);padding-left:16px;margin-left:16px;">
+                  <div class="flow-arrow-down" style="color:var(--amber)">↓</div>
+                  <div class="flow-node flow-con">
+                    <div class="flow-node-tag">CONCIERGE</div>
+                    <div class="flow-node-name">Nova Lite · Standalone</div>
+                    <div class="flow-node-tools">get_pnr_status<br>lookup_policy<br>flag_human_review</div>
+                  </div>
+                  <div style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--amber);text-align:center;">Customer chat path</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Skills vs subagents ────────────────────────────────────────── -->
+  <div class="arch-section">
+    <div class="arch-section-inner">
+      <div class="arch-section-label">Skill Library</div>
+      <div class="arch-two-col">
+        <div class="arch-col-text">
+          <h3 class="arch-h3">Skills for documents. Subagents for decisions.</h3>
+          <p>The distinction matters. A skill is a stateless, deterministic function — no model call, no latency, no cost. It encodes reference knowledge (policy documents, IATA code tables, SSR definitions) in a form that any agent can call without re-deriving the same information from scratch.</p>
+          <p>Subagents own judgment and action. Skills own knowledge and lookup. Keeping these separate means policy updates propagate instantly across all agents without prompt engineering — change the policy chunk, all agents benefit.</p>
+        </div>
+        <div class="arch-col-cards">
+          <div class="skill-card">
+            <div class="skill-card-header">
+              <span class="skill-tag">SKILL</span>
+              <span class="skill-name">lookup_policy</span>
+            </div>
+            <div class="skill-desc">Keyword search over 30 chunks parsed from Qantas Compensation Policy, Conditions of Carriage, and ACCC Travel Rights. Returns the exact policy section relevant to a compensation decision.</div>
+            <div class="skill-used">Used by: Rebooking · Concierge</div>
+          </div>
+          <div class="skill-card">
+            <div class="skill-card-header">
+              <span class="skill-tag">SKILL</span>
+              <span class="skill-name">lookup_iata_code</span>
+            </div>
+            <div class="skill-desc">Maps an IATA delay code to its human label and control classification (controllable / uncontrollable). This single lookup determines voucher eligibility for every passenger in every disruption.</div>
+            <div class="skill-used">Used by: Rebooking · GuardrailHook</div>
+          </div>
+          <div class="skill-card">
+            <div class="skill-card-header">
+              <span class="skill-tag">SKILL</span>
+              <span class="skill-name">check_ssr_codes</span>
+            </div>
+            <div class="skill-desc">Parses a passenger's Special Service Request codes and returns safety sensitivity flags. A single WCHR or UMNR code immediately halts automated rebooking and routes the case to a human agent.</div>
+            <div class="skill-used">Used by: Concierge · GuardrailHook</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Guardrail architecture ─────────────────────────────────────── -->
+  <div class="arch-section arch-section-alt">
+    <div class="arch-section-inner">
+      <div class="arch-section-label">Guardrail Architecture</div>
+      <h3 class="arch-h3" style="margin-bottom:12px;">Two layers. Different jobs. Both necessary.</h3>
+      <p style="color:var(--text-muted);font-size:14px;max-width:680px;margin-bottom:36px;line-height:1.7;">
+        A single guardrail layer is insufficient for a safety-critical system. Infrastructure-level guardrails handle generic threats. Application-level guardrails handle domain-specific compliance. They operate at different points in the request lifecycle and are maintained by different teams.
+      </p>
+
+      <div class="guardrail-grid">
+        <div class="guardrail-card guardrail-infra">
+          <div class="guardrail-layer-label">Layer 1 — Infrastructure</div>
+          <h4>Bedrock Guardrails</h4>
+          <div class="guardrail-meta">Provisioned via AWS CDK · Applied before agent invocation</div>
+          <p>Classifies raw user input against seven denied topic categories using natural language understanding. Blocks prompt injection attempts, off-topic queries (new bookings, loyalty points, competitor airlines), and harmful content — before the agent is ever invoked. Configured by the platform team, not the product team.</p>
+          <div class="guardrail-topics">
+            <span class="gtopic">prompt_injection</span>
+            <span class="gtopic">new_booking</span>
+            <span class="gtopic">seat_upgrade</span>
+            <span class="gtopic">baggage_claims</span>
+            <span class="gtopic">loyalty_points</span>
+            <span class="gtopic">general_travel</span>
+            <span class="gtopic">competitor_airlines</span>
+          </div>
+        </div>
+
+        <div class="guardrail-card guardrail-app">
+          <div class="guardrail-layer-label">Layer 2 — Application</div>
+          <h4>GuardrailHook</h4>
+          <div class="guardrail-meta">Strands BeforeToolCallEvent · Fires before every tool call</div>
+          <p>Domain-specific constraints that require knowledge of passenger state, IATA codes, and business policy — things a generic content classifier cannot evaluate. Three distinct rules, each addressing a different category of risk.</p>
+          <div class="guardrail-rules">
+            <div class="grule">
+              <div class="grule-code red">TC-02 · SSR SAFETY HALT</div>
+              <div class="grule-desc">Detects safety-sensitive Special Service Request codes (WCHR, UMNR, MEDA, OXYG) before rebook_flight executes. Halts automation, flags for human agent. Aircraft compatibility must be verified by a person.</div>
+            </div>
+            <div class="grule">
+              <div class="grule-code amber">TC-03 · POLICY ALIGNMENT</div>
+              <div class="grule-desc">Checks IATA delay code control classification before issue_voucher. Blocks hotel vouchers for uncontrollable events (weather, ATC). Enforces Qantas compensation policy section 3 at the tool level.</div>
+            </div>
+            <div class="grule">
+              <div class="grule-code blue">TC-04 · BUDGET CAP</div>
+              <div class="grule-desc">Checks cumulative workflow cost against the configured USD cap before every tool call. Terminates the agent loop if exceeded, preserving partial resolutions. Prevents runaway spend in high-volume disruptions.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Observability ──────────────────────────────────────────────── -->
+  <div class="arch-section">
+    <div class="arch-section-inner">
+      <div class="arch-section-label">Observability &amp; Cost Monitoring</div>
+      <div class="arch-two-col">
+        <div class="arch-col-text">
+          <h3 class="arch-h3">Every token. Every tool call. Every decision.</h3>
+          <p>The WorkflowTraceHook captures every agent event — tool calls, invocation completions, guardrail interventions — and streams them to the frontend via Server-Sent Events in real time. This is not logging after the fact; it is live observability built into the agent lifecycle.</p>
+          <p>The TokenLedger accumulates cost per agent, per model, per workflow. The cost bar in the demo updates after every tool call. This is the same pattern that would feed a production CloudWatch dashboard or cost allocation report.</p>
+
+          <div class="obs-metrics">
+            <div class="obs-metric">
+              <div class="obs-metric-val" style="color:var(--blue)">Per tool call</div>
+              <div class="obs-metric-key">Trace granularity</div>
+            </div>
+            <div class="obs-metric">
+              <div class="obs-metric-val" style="color:var(--green)">Real-time SSE</div>
+              <div class="obs-metric-key">Delivery mechanism</div>
+            </div>
+            <div class="obs-metric">
+              <div class="obs-metric-val" style="color:var(--amber)">Per agent</div>
+              <div class="obs-metric-key">Cost breakdown</div>
+            </div>
+            <div class="obs-metric">
+              <div class="obs-metric-val" style="color:var(--red)">$0.10 USD</div>
+              <div class="obs-metric-key">Workflow budget cap</div>
+            </div>
+          </div>
+
+          <div class="arch-note" style="margin-top:24px;">
+            <span class="arch-note-label">Production Extension</span>
+            In production this pattern extends naturally to CloudWatch custom metrics (token usage by agent), Cost Explorer tags (cost per workflow type), and Bedrock model invocation logs (latency distribution, error rates). The hook system is the integration point — no agent code changes required.
+          </div>
+        </div>
+
+        <div class="arch-col-text">
+          <h3 class="arch-h3">Data architecture: demo-ready, production-portable.</h3>
+          <p>The demo runs on SQLite in a container — zero infrastructure, instant startup. The schema mirrors a production Airline Passenger Service System (PSS) exactly: the same five tables, the same IATA column conventions, the same foreign key relationships.</p>
+          <p>The FetcherAgent's semantic layer — DDL, business glossary, and six gold-standard JOIN queries — is injected as a structured system prompt. This is the Amazon Q Generative SQL pattern: teach the model the schema once, let it query accurately without hallucinating column names. Swap the connection string for Redshift Serverless and the pattern is production-ready.</p>
+
+          <div class="db-tables">
+            <div class="db-table-row">
+              <span class="db-table-name">FLIGHT_LEG</span>
+              <span class="db-table-desc">Physical schedule · status · aircraft type</span>
+            </div>
+            <div class="db-table-row">
+              <span class="db-table-name">PNR_HEADER</span>
+              <span class="db-table-desc">Core booking reference · confirmation status</span>
+            </div>
+            <div class="db-table-row">
+              <span class="db-table-name">PASSENGER_SEGMENT</span>
+              <span class="db-table-desc">Passenger ↔ flight junction · cabin class</span>
+            </div>
+            <div class="db-table-row">
+              <span class="db-table-name">PASSENGER_PROFILE</span>
+              <span class="db-table-desc">Loyalty tier · QFF number · SSR codes</span>
+            </div>
+            <div class="db-table-row">
+              <span class="db-table-name">IROPS_LOG</span>
+              <span class="db-table-desc">Disruption trigger · IATA code · audit trail</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Infrastructure ─────────────────────────────────────────────── -->
+  <div class="arch-section arch-section-alt">
+    <div class="arch-section-inner">
+      <div class="arch-section-label">Infrastructure &amp; Delivery</div>
+      <div class="infra-grid">
+        <div class="infra-card">
+          <div class="infra-icon" style="color:var(--orange, #FF9900)">▲</div>
+          <h4>AWS CDK (Python)</h4>
+          <p>All infrastructure is code. EC2 instance, IAM roles, Bedrock Guardrail, EventBridge scheduler, CloudFront distribution, and S3 bucket — all provisioned from a single CDK project. Deploy order and dependency management are explicit.</p>
+        </div>
+        <div class="infra-card">
+          <div class="infra-icon" style="color:var(--blue)">◈</div>
+          <h4>Bedrock + Strands SDK</h4>
+          <p>Amazon Bedrock provides model invocation (Claude Haiku 4.5, Nova Lite) and managed Guardrails. The AWS Strands SDK provides the agent loop, hook system, and tool execution framework — no custom orchestration code required.</p>
+        </div>
+        <div class="infra-card">
+          <div class="infra-icon" style="color:var(--green)">◉</div>
+          <h4>Docker + nginx</h4>
+          <p>Two containers managed by docker-compose: nginx (static files + reverse proxy) and FastAPI (agent API). EC2 instance profile provides AWS credentials — no secrets in configuration. Containers restart automatically on EC2 start via systemd.</p>
+        </div>
+        <div class="infra-card">
+          <div class="infra-icon" style="color:var(--amber)">◎</div>
+          <h4>EventBridge Scheduler</h4>
+          <p>EC2 starts at 7am and stops at 7pm Sydney time, weekdays only — timezone-aware, DST-handled automatically. Manual override via AWS CLI when needed. Reduces compute cost by ~70% versus always-on.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<style>
+/* ── Architecture page styles ─────────────────────────────────────── */
+.arch-page { padding-top: 0; }
+
+.arch-hero {
+  padding: 72px 40px 60px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(232,0,45,0.04) 0%, transparent 100%);
+}
+
+.arch-hero-inner { max-width: 1000px; margin: 0 auto; }
+
+.arch-eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--red);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.arch-h2 {
+  font-family: var(--mono);
+  font-size: clamp(24px, 3vw, 40px);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+.arch-h2 em {
+  font-style: normal;
+  color: var(--red);
+}
+
+.arch-lead {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.8;
+  max-width: 680px;
+}
+
+.arch-section {
+  padding: 64px 40px;
+  border-bottom: 1px solid var(--border);
+}
+
+.arch-section-alt { background: var(--surface); }
+
+.arch-section-inner { max-width: 1000px; margin: 0 auto; }
+
+.arch-section-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.arch-h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 16px;
+}
+
+/* Pillars */
+.pillar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.pillar-card {
+  background: var(--surface);
+  padding: 36px 28px;
+  position: relative;
+}
+
+.pillar-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+}
+
+.pillar-icon {
+  font-size: 20px;
+  color: var(--red);
+  margin-bottom: 14px;
+  display: block;
+}
+
+.pillar-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.pillar-card p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* Two col layout */
+.arch-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+
+.arch-col-text p {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.75;
+  margin-bottom: 16px;
+}
+
+/* Agent table */
+.agent-table {
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.agent-row {
+  display: grid;
+  grid-template-columns: 130px 90px 1fr;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+  font-size: 12px;
+}
+
+.agent-row:last-child { border-bottom: none; }
+
+.agent-row-header {
+  background: var(--surface2);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.agent-name {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: inline-block;
+}
+
+.agent-name.orc { background: rgba(255,255,255,0.06); color: var(--text-muted); }
+.agent-name.fch { background: var(--blue-dim);  color: var(--blue); }
+.agent-name.rbk { background: var(--green-dim); color: var(--green); }
+.agent-name.con { background: var(--amber-dim); color: var(--amber); }
+
+.agent-model {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  padding-top: 3px;
+}
+
+.agent-role {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Architecture note */
+.arch-note {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--red);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-top: 20px;
+}
+
+.arch-note-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--red);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* Flow diagram */
+.flow-diagram {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  font-family: var(--mono);
+}
+
+.flow-trigger {
+  text-align: center;
+  padding: 10px;
+  background: var(--red-dim);
+  border: 1px solid rgba(232,0,45,0.3);
+  border-radius: var(--radius);
+  margin-bottom: 4px;
+}
+
+.flow-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--red);
+  letter-spacing: 0.08em;
+}
+
+.flow-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.flow-arrow-down {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 14px;
+  padding: 3px 0;
+}
+
+.flow-node {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  background: var(--surface);
+}
+
+.flow-node.flow-orc { border-color: rgba(255,255,255,0.12); }
+.flow-node.flow-fch { border-color: rgba(74,158,255,0.3); }
+.flow-node.flow-rbk { border-color: rgba(46,204,113,0.3); }
+.flow-node.flow-con { border-color: rgba(200,168,75,0.3); }
+
+.flow-node-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+
+.flow-orc .flow-node-tag { color: var(--text-muted); }
+.flow-fch .flow-node-tag { color: var(--blue); }
+.flow-rbk .flow-node-tag { color: var(--green); }
+.flow-con .flow-node-tag { color: var(--amber); }
+
+.flow-node-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.flow-node-tools {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.flow-node-role {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.flow-branch { margin-top: 4px; }
+.flow-branch-nodes { display: flex; gap: 0; align-items: flex-start; }
+.flow-branch-item { flex: 1; }
+
+/* Skills */
+.arch-col-cards { display: flex; flex-direction: column; gap: 12px; }
+
+.skill-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+
+.skill-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.skill-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--red-dim);
+  color: var(--red);
+  letter-spacing: 0.06em;
+}
+
+.skill-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.skill-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.skill-used {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+/* Guardrails */
+.guardrail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.guardrail-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+}
+
+.guardrail-infra { border-top: 3px solid var(--blue); }
+.guardrail-app   { border-top: 3px solid var(--red); }
+
+.guardrail-layer-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.guardrail-card h4 {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.guardrail-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+
+.guardrail-card p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.guardrail-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gtopic {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: var(--blue-dim);
+  color: var(--blue);
+  border: 1px solid rgba(74,158,255,0.2);
+}
+
+.guardrail-rules { display: flex; flex-direction: column; gap: 12px; }
+
+.grule {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.grule-code {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.grule-code.red   { color: var(--red); }
+.grule-code.amber { color: var(--amber); }
+.grule-code.blue  { color: var(--blue); }
+
+.grule-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* Observability metrics */
+.obs-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 24px;
+}
+
+.obs-metric {
+  background: var(--surface2);
+  padding: 16px 14px;
+}
+
+.obs-metric-val {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.obs-metric-key {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* DB tables */
+.db-tables {
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.db-table-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.db-table-row:last-child { border-bottom: none; }
+
+.db-table-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  min-width: 160px;
+  flex-shrink: 0;
+}
+
+.db-table-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Infrastructure grid */
+.infra-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.infra-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+}
+
+.infra-icon {
+  font-size: 20px;
+  margin-bottom: 14px;
+  display: block;
+}
+
+.infra-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.infra-card p {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+@media (max-width: 900px) {
+  .pillar-grid        { grid-template-columns: 1fr; }
+  .arch-two-col       { grid-template-columns: 1fr; gap: 32px; }
+  .guardrail-grid     { grid-template-columns: 1fr; }
+  .infra-grid         { grid-template-columns: 1fr 1fr; }
+}
+</style>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PAGE 2 — THE SOLUTION
+════════════════════════════════════════════════════════════════════ -->
+<section class="page" id="page-demo">
+  <div class="demo-layout">
+
+    <!-- Left sidebar -->
+    <aside class="sidebar">
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Run a Scenario</div>
+        <button class="scenario-btn" id="btn-A" onclick="triggerScenario('A')">
+          <div class="scenario-code">Scenario A — Happy Path</div>
+          <div class="scenario-title">Aircraft on Ground · QF400 SYD→MEL</div>
+          <div class="scenario-desc">QF400 cancelled due to a mechanical fault (IATA code 41, controllable). A Platinum frequent flyer in Business class with no special service requests. The agent auto-rebooks onto QF402 and issues a $30 AUD meal voucher per Qantas compensation policy section 2.</div>
+        </button>
+        <button class="scenario-btn" id="btn-B" onclick="triggerScenario('B')">
+          <div class="scenario-code">Scenario B — Guardrail TC-03</div>
+          <div class="scenario-title">Weather Delay · QF731 SYD→BNE</div>
+          <div class="scenario-desc">QF731 delayed by adverse weather (IATA code 71, uncontrollable). A Bronze tier passenger in Economy class. The agent rebooks onto QF733, but guardrail TC-03 blocks the hotel voucher — Qantas policy section 3 does not obligate accommodation for events outside airline control.</div>
+        </button>
+        <button class="scenario-btn" id="btn-C" onclick="triggerScenario('C')">
+          <div class="scenario-code">Scenario C — Guardrail TC-02</div>
+          <div class="scenario-title">SSR Safety Hard Stop · QF8 SYD→LHR</div>
+          <div class="scenario-desc">QF8 cancelled (IATA code 41). A Gold tier passenger holds a WCHR (wheelchair) special service request. Guardrail TC-02 fires before automated rebooking — aircraft compatibility and ground handling must be verified by a human agent before any rebooking proceeds.</div>
+        </button>
+        <button class="scenario-btn" id="btn-D" onclick="triggerScenario('D')">
+          <div class="scenario-code">Scenario D — Guardrail TC-04</div>
+          <div class="scenario-title">Token Budget Exceeded · QF500 MEL→SYD</div>
+          <div class="scenario-desc">QF500 cancelled (IATA code 41) with twelve passengers spanning all loyalty tiers. The volume of agent tool calls causes cumulative workflow cost to exceed the $0.10 USD governance cap. Guardrail TC-04 halts the loop mid-run; partial resolutions are preserved and remaining passengers require manual handling.</div>
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- Centre: trace panel -->
+    <div class="demo-main">
+      <div class="trace-header">
+        <span class="trace-title">Workflow Trace</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="status-badge status-idle" id="workflow-status">IDLE</span>
+          <span class="workflow-id-display" id="workflow-id-display">—</span>
+        </div>
+      </div>
+      <div class="trace-body" id="trace-body">
+        <div class="trace-empty" id="trace-empty">
+          <div class="trace-empty-icon">◎</div>
+          <div class="trace-empty-text">SELECT A SCENARIO TO BEGIN</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: usage + history + resolution -->
+    <div class="resolution-panel">
+      <div class="resolution-header">
+        <span class="panel-title">Resolutions</span>
+        <span class="resolution-count" id="res-count">0 workflows</span>
+      </div>
+
+      <!-- Live Usage (open by default) -->
+      <details class="rp-section" open>
+        <summary>Live Usage</summary>
+        <div class="rp-section-body">
+          <div class="usage-meter">
+            <div class="usage-clock" id="live-clock">—</div>
+            <div class="cost-row">
+              <span class="cost-key">SESSION COST</span>
+              <span class="cost-val" id="cost-total">$0.000000</span>
+            </div>
+            <div class="cost-row">
+              <span class="cost-key">TOTAL TOKENS</span>
+              <span class="cost-val" id="cost-tokens-total" style="color:var(--text-muted);font-size:11px;">0</span>
+            </div>
+            <div class="cost-row">
+              <span class="cost-key">BUDGET HITS</span>
+              <span class="cost-val" id="cost-budget-hits" style="color:var(--text-dim);font-size:11px;">0</span>
+            </div>
+            <div class="cost-row">
+              <span class="cost-key">RUN CAP</span>
+              <span class="cost-val" style="color:var(--text-dim);">$0.10</span>
+            </div>
+            <div class="cost-bar-track">
+              <div class="cost-bar-fill" id="cost-bar"></div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Past Runs (closed by default) -->
+      <details class="rp-section">
+        <summary>Past Runs</summary>
+        <div class="rp-section-body">
+          <div class="history-list" id="history-list">
+            <div class="history-empty">NO HISTORY YET</div>
+          </div>
+        </div>
+      </details>
+
+      <div class="resolution-body" id="resolution-body">
+        <div class="resolution-empty" id="res-empty">AWAITING WORKFLOW</div>
+      </div>
+      <div class="avail-bar" id="avail-bar">
+        <div class="avail-dot"></div>
+        <span id="avail-text">CHECKING…</span>
+      </div>
+    </div>
+
+    <!-- Center bottom: chat -->
+    <div class="chat-outer">
+      <div class="chat-header" id="chat-header">
+        <span class="chat-title-label">CONCIERGE</span>
+        <span class="chat-guardrail-note" id="chat-guardrail-note">BEDROCK GUARDRAIL ACTIVE</span>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-msg assistant">Hi, I'm the Qantas IROPS Assistant. I can answer policy questions, check a booking status (give me a PNR), or run a custom disruption simulation. What would you like to do?</div>
+      </div>
+      <div class="sample-questions" id="sample-questions">
+        <span class="sample-q" onclick="sendSampleQ(this)">What compensation am I entitled to for a cancelled flight?</span>
+        <span class="sample-q" onclick="sendSampleQ(this)">Check booking AABBCC</span>
+        <span class="sample-q" onclick="sendSampleQ(this)">Run a weather delay scenario with a Gold passenger</span>
+        <span class="sample-q" onclick="sendSampleQ(this)">What happens if a passenger has a WCHR code?</span>
+      </div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chat-input" type="text" placeholder="Ask a policy question, check a PNR, or run a simulation..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="chat-send" id="chat-send-btn" onclick="sendChat()">SEND</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PAGE 3 — ABOUT
+════════════════════════════════════════════════════════════════════ -->
+<section class="page" id="page-about">
+  <div class="about-layout">
+
+    <!-- ── Left: structured lists ── -->
+    <div class="about-right">
+
+      <h3>Education</h3>
+      <ul class="skill-list">
+        <li><span class="edu-year">2026</span>Graduate Certificate in AI &amp; ML — University of Adelaide</li>
+        <li><span class="edu-year">2016</span>Master of Science in Statistics — University of Hong Kong</li>
+        <li><span class="edu-year">2012</span>BBA (Hons) in Finance — City University of Hong Kong</li>
+      </ul>
+
+      <h3>Certificates</h3>
+      <ul class="skill-list">
+        <li><span class="edu-year">2025</span>Snowflake Platform Certificate</li>
+        <li><span class="edu-year">2024</span>Databricks Certified Data Engineer</li>
+        <li><span class="edu-year">2023</span>AWS Solutions Architect · AWS ML Specialty</li>
+      </ul>
+
+      <h3>Skills</h3>
+      <ul class="skill-list">
+        <li>Business &amp; Leadership — client advisory, stakeholder management, agile PM</li>
+        <li>AI &amp; Data — agentic patterns, prompt engineering &amp; evaluation, AI observability, Python, R, SQL</li>
+        <li>Platforms — AWS, Databricks, Snowflake, M365, PowerBI, DevOps</li>
+      </ul>
+
+      <h3>This Demo</h3>
+      <ul class="skill-list">
+        <li>AWS Strands SDK — multi-agent orchestration</li>
+        <li>Amazon Bedrock — Claude Haiku 4.5 + Nova Lite</li>
+        <li>Bedrock Guardrails — CDK-provisioned</li>
+        <li>FastAPI + SSE — real-time observability</li>
+        <li>AWS CDK · Docker · nginx · EC2</li>
+      </ul>
+
+    </div>
+
+    <!-- ── Right: bio + experience ── -->
+    <div class="about-left">
+      <h2>Yifei Luo</h2>
+      <div class="role">Applying for Senior Manager, Applied AI — Qantas</div>
+
+      <p>
+        I am drawn to this role because I really enjoy solving real customer problems.
+        I believe the true value of AI is realised when we bridge the gap between
+        technical innovation and practical execution — delivering tangible solutions
+        that measurably enhance the passenger journey. Because this role calls for
+        a "builder-leader," I wanted to show rather than just tell: I built this
+        end-to-end multi-agent prototype specifically for Qantas, demonstrating how
+        AI can instantly process policy guidelines to handle flight rebooking, issue
+        compensation coupons, manage passenger re-accommodation, and trigger manual
+        review when human intervention is needed.
+      </p>
+
+      <div class="about-section-label">Recent Experience</div>
+
+      <div class="exp-item">
+        <div class="exp-meta">
+          <span class="exp-period">Mar 2025 – Present</span>
+          <span class="exp-title">AI Developer</span>
+          <span class="exp-company">Santos · Adelaide</span>
+        </div>
+        <p class="exp-story">
+          At Santos, I lead AI products development across three business
+          units — procurement, health &amp; safety, and governance — acting as a
+          trusted advisor embedded across the full product lifecycle from discovery
+          to production. I design and deploy agent architectures that integrate
+          M365 and Snowflake, and I own the governance layer: cost controls, model
+          selection criteria, and prompt evaluation frameworks for responsible
+          GenAI adoption.
+        </p>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-meta">
+          <span class="exp-period">Nov 2024 – Mar 2025</span>
+          <span class="exp-title">Independent Consultant</span>
+          <span class="exp-company">YouChill Consulting · Adelaide</span>
+        </div>
+        <p class="exp-story">
+          Ran an independent consulting engagement with Hong Kong Jockey Club,
+          conducting global regulatory research on responsible gambling frameworks
+          across international markets.
+        </p>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-meta">
+          <span class="exp-period">Jun 2022 – Oct 2024</span>
+          <span class="exp-title">Data Science Lead</span>
+          <span class="exp-company">Hong Kong Jockey Club · Hong Kong</span>
+        </div>
+        <p class="exp-story">
+          Bridged business and data teams for a platform of three million app
+          users — defining campaign goals, building success metrics, and developing
+          causal inference models that informed marketing decisions at scale. Built
+          a constrained optimisation model for race scheduling, translating complex
+          operational constraints into practical guidance for operations. Managed a
+          team of ten, driving capability uplift and establishing modern CI/CD and
+          product engineering standards.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — max-width 1120px
+   Stacks all multi-column/grid layouts into a single-column flow.
+   Desktop view (>1120px) is completely unchanged.
+   ══════════════════════════════════════════════════════════════════ */
+/* Desktop: hide mobile logo; Mobile: hide desktop-only elements */
+.mobile-logo { display: none; }
+
+@media (max-width: 1120px) {
+
+  /* ── Navigation ─────────────────────────────────────────────────── */
+  nav {
+    height: auto !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: 10px 16px !important;
+    gap: 6px !important;
+  }
+  .nav-brand {
+    font-size: 9px !important;
+    letter-spacing: 0.03em !important;
+  }
+  .mobile-logo  { display: block; height: 28px; width: auto; }
+  .nav-brand img.qf-logo.desktop-only,
+  .nav-brand .desktop-only { display: none !important; }
+  .nav-links {
+    flex-wrap: wrap !important;
+    gap: 2px 4px !important;
+    width: 100% !important;
+  }
+  .nav-links a {
+    font-size: 11px !important;
+    padding: 5px 10px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Extra top-padding to clear the taller stacked nav */
+  .page,
+  #page-problem,
+  #page-demo,
+  #page-about,
+  #page-arch,
+  main {
+    padding-top: 100px !important;
+  }
+
+  /* ── Page 1: Problem ────────────────────────────────────────────── */
+  .arch-hero {
+    padding: 32px 16px 28px !important;
+  }
+  /* Hero inner: flex row → column */
+  .arch-hero-inner,
+  .hero-inner {
+    flex-direction: column !important;
+    gap: 24px !important;
+    align-items: flex-start !important;
+  }
+  /* Hero image: full width below text */
+  .hero-image {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  .hero-image img {
+    max-width: 100% !important;
+  }
+  /* Arch-page hero image (inline-styled div with width:340px) */
+  .arch-hero-inner > div:last-child {
+    width: 100% !important;
+    flex-shrink: 1 !important;
+    justify-content: center !important;
+  }
+  .arch-hero-inner > div:last-child img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  /* Impact stats: 3-col → 1-col */
+  .impact-stats {
+    grid-template-columns: 1fr !important;
+  }
+  /* Problem section */
+  .problem-section {
+    padding: 32px 16px !important;
+  }
+  /* Problem grid: 2-col → 1-col */
+  .problem-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* Policy grid: 3-col → 1-col */
+  .policy-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ── Page 2: Architecture ────────────────────────────────────────── */
+  .arch-section {
+    padding: 36px 16px !important;
+  }
+  /* 3-col pillars → 1-col */
+  .pillar-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* 2-col text sections → 1-col */
+  .arch-two-col {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+  /* Guardrail grid: 2-col → 1-col */
+  .guardrail-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* Infrastructure: 4-col → 2-col */
+  .infra-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  /* Observability metrics: keep 2-col (small cells, OK on mobile) */
+  .obs-metrics {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  /* Agent table: tighten columns */
+  .agent-row {
+    grid-template-columns: 100px 68px 1fr !important;
+    gap: 8px !important;
+    font-size: 11px !important;
+  }
+  .db-table-name {
+    min-width: 110px !important;
+    font-size: 10px !important;
+  }
+  /* Flow diagram: horizontal scroll so the layout is preserved */
+  .arch-col-diagram {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .flow-diagram {
+    min-width: 480px !important;
+  }
+
+  /* ── Page 3: Demo — collapse 3-column grid to vertical stack ──────── */
+  #page-demo {
+    overflow: visible !important;
+  }
+  .demo-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  /* Sidebar (scenarios): full width, auto height */
+  .sidebar {
+    grid-row: unset !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    overflow-y: visible !important;
+    max-height: none !important;
+  }
+  /* Trace panel: full width, scrollable inner body */
+  .demo-main {
+    grid-column: unset !important;
+    grid-row: unset !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    min-height: 360px !important;
+    overflow: visible !important;
+  }
+  .trace-body {
+    overflow-y: auto !important;
+    max-height: 320px !important;
+  }
+  /* Chat: full width below trace */
+  .chat-outer {
+    grid-column: unset !important;
+    grid-row: unset !important;
+    border-right: none !important;
+    border-top: 1px solid var(--border) !important;
+    overflow: visible !important;
+  }
+  .chat-messages {
+    max-height: 220px !important;
+    overflow-y: auto !important;
+  }
+  /* Resolution panel: full width below chat */
+  .resolution-panel {
+    grid-column: unset !important;
+    grid-row: unset !important;
+    overflow-y: visible !important;
+    overflow-x: visible !important;
+    border-top: 1px solid var(--border) !important;
+  }
+
+  /* ── Page 4: About ───────────────────────────────────────────────── */
+  .about-layout {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+    padding: 32px 16px !important;
+  }
+  /* Move intro/bio above the skills list on mobile */
+  .about-left  { order: -1 !important; }
+  .about-right { order:  0 !important; }
+
+  /* ── Global type scaling ─────────────────────────────────────────── */
+  .hero-title {
+    font-size: clamp(22px, 7vw, 36px) !important;
+  }
+  .arch-h2 {
+    font-size: clamp(20px, 6vw, 32px) !important;
+  }
+  .hero-body,
+  .arch-lead {
+    font-size: 14px !important;
+  }
+  .stat-value {
+    font-size: 28px !important;
+  }
+}
+</style>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────
+const API = '/api';
+
+// ── Page navigation ───────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  return false;
+}
+
+// ── State ─────────────────────────────────────────────────────────────
+let activeWorkflowId   = null;
+let activeEventSource  = null;
+let resolutionCount    = 0;
+let chatHistory        = [];
+let chatStreaming       = false;
+
+// Session-aggregate cost tracking (accumulates across runs, not reset on new scenario)
+let sessionBaseCost    = 0;    // sum of completed workflow costs
+let sessionTotalTokens = 0;    // sum of completed workflow tokens
+let budgetExceededCount = 0;   // count of budget_exceeded workflows
+let chatSessionCost    = 0;    // cumulative concierge chat cost this session
+
+function _newSessionId() { return 'sess-' + Math.random().toString(36).slice(2, 10); }
+let conciergeSessionId = _newSessionId();
+
+// ── Scenario trigger ──────────────────────────────────────────────────
+async function triggerScenario(scenario) {
+  if (activeEventSource) { activeEventSource.close(); activeEventSource = null; }
+
+  // Reset UI
+  resetTraceUI();
+  resetRunBar();
+  resetResolutionUI();
+  setScenarioBtnState(scenario, 'running');
+  setWorkflowStatus('running', 'RUNNING');
+
+  try {
+    const res = await fetch(`${API}/irops/trigger`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scenario }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      appendTraceError(`Trigger failed: ${err.detail || res.status}`);
+      setWorkflowStatus('error', 'ERROR');
+      setScenarioBtnState(scenario, 'error');
+      return;
+    }
+
+    const data = await res.json();
+    activeWorkflowId = data.workflow_id;
+    document.getElementById('workflow-id-display').textContent = data.workflow_id;
+
+    // Connect SSE stream
+    connectWorkflowStream(data.workflow_id, scenario);
+
+  } catch(e) {
+    appendTraceError(`Network error: ${e.message}`);
+    setWorkflowStatus('error', 'ERROR');
+    setScenarioBtnState(scenario, 'error');
+  }
+}
+
+// ── SSE stream ────────────────────────────────────────────────────────
+function connectWorkflowStream(workflowId, scenario) {
+  const url = `${API}/workflow/${workflowId}/stream`;
+  const es  = new EventSource(url);
+  activeEventSource = es;
+
+  es.onmessage = (evt) => {
+    if (evt.data === '[DONE]') {
+      es.close();
+      activeEventSource = null;
+      return;
+    }
+    try {
+      const step = JSON.parse(evt.data);
+      handleWorkflowStep(step, scenario);
+    } catch(e) {
+      console.warn('SSE parse error:', e);
+    }
+  };
+
+  es.onerror = () => {
+    es.close();
+    activeEventSource = null;
+  };
+}
+
+function handleWorkflowStep(step, scenario) {
+  if (step.type === 'workflow_complete') {
+    handleWorkflowComplete(step.summary, scenario);
+    return;
+  }
+
+  // Hide empty state
+  document.getElementById('trace-empty').style.display = 'none';
+
+  // Determine step class
+  const isGuardrail = step.type === 'guardrail';
+  const agentName   = (step.agent || 'orchestrator').toLowerCase();
+  const extraClass  = isGuardrail
+    ? (step.status === 'halted' ? 'guardrail-halt' : 'guardrail-blocked')
+    : '';
+
+  const dotClass = isGuardrail ? 'guardrail' : agentName;
+  const agentLabel = {
+    fetcher: 'FCH', rebooking: 'RBK', concierge: 'CON',
+    orchestrator: 'ORC', guardrail: 'GRD'
+  }[agentName] || agentName.toUpperCase().slice(0,3);
+
+  const time = step.timestamp
+    ? new Date(step.timestamp).toLocaleTimeString([], {
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      })
+    : '';
+
+  const costStr = step.step_cost_usd !== undefined
+    ? `$${step.step_cost_usd.toFixed(6)} · cumulative $${(step.cumulative_cost_usd||0).toFixed(4)}`
+    : '';
+
+  const tokenStr = step.input_tokens
+    ? `${step.input_tokens}↑ ${step.output_tokens}↓`
+    : '';
+
+  // For guardrail steps, the existing detail text IS the human explanation — don't need summary
+  const showSummary = step.summary && !isGuardrail;
+  // For non-guardrail tool_call steps, de-emphasize the raw "agent → tool" detail
+  const showDetail  = step.detail && (isGuardrail || !step.summary);
+
+  const html = `
+    <div class="trace-step ${extraClass}">
+      <div class="step-num">${step.step_num > 0 ? step.step_num : '!'}</div>
+      <div class="step-connector">
+        <div class="step-dot ${dotClass}"></div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <div class="step-meta">
+          <span class="step-agent ${agentName}">${agentLabel}</span>
+          <span class="step-action">${escHtml(step.action || '')}</span>
+          <span class="step-time">${time}</span>
+        </div>
+        ${showSummary ? `<div class="step-summary">${escHtml(step.summary)}</div>` : ''}
+        ${showDetail  ? `<div class="step-detail">${escHtml(step.detail)}</div>` : ''}
+        ${costStr || tokenStr ? `<div class="step-cost">${tokenStr}${tokenStr && costStr ? ' · ' : ''}${costStr}</div>` : ''}
+      </div>
+    </div>`;
+
+  const body = document.getElementById('trace-body');
+  body.insertAdjacentHTML('beforeend', html);
+  body.scrollTop = body.scrollHeight;
+
+  // Update cost meter
+  if (step.cumulative_cost_usd !== undefined) updateCostUI(step);
+}
+
+function handleWorkflowComplete(summary, scenario) {
+  const status = summary.status || 'complete';
+  const uiStatus = {
+    complete:       ['complete', 'COMPLETE'],
+    human_review:   ['error',   'HUMAN REVIEW'],
+    budget_exceeded:['error',   'BUDGET CAP'],
+    guardrail_halt: ['error',   'GUARDRAIL HALT'],
+    error:          ['error',   'ERROR'],
+  }[status] || ['complete', status.toUpperCase()];
+
+  setWorkflowStatus(uiStatus[0], uiStatus[1]);
+  setScenarioBtnState(scenario, status === 'complete' ? 'complete' : 'error');
+
+  // Accumulate session totals
+  sessionBaseCost    += summary.total_cost_usd  || 0;
+  _lastWorkflowRunCost = 0;   // run is done — fold into sessionBaseCost
+  sessionTotalTokens += summary.total_tokens    || 0;
+  if (status === 'budget_exceeded') {
+    budgetExceededCount++;
+    document.getElementById('cost-budget-hits').textContent = budgetExceededCount;
+  }
+  document.getElementById('cost-total').textContent        = '$' + (sessionBaseCost + chatSessionCost).toFixed(6);
+  document.getElementById('cost-tokens-total').textContent = sessionTotalTokens.toLocaleString();
+
+  // Append summary step
+  const body = document.getElementById('trace-body');
+  const statusColor = {
+    complete: 'var(--green)', human_review: 'var(--amber)',
+    budget_exceeded: 'var(--red)', guardrail_halt: 'var(--red)',
+  }[status] || 'var(--text-muted)';
+
+  body.insertAdjacentHTML('beforeend', `
+    <div style="padding:16px 0 0 36px;font-family:var(--mono);font-size:11px;color:${statusColor};">
+      ■ WORKFLOW ${uiStatus[1]} · ${summary.passengers_resolved} resolved
+      · $${(summary.total_cost_usd||0).toFixed(6)} total
+    </div>`);
+  body.scrollTop = body.scrollHeight;
+
+  // Load resolution records
+  loadResolutions(summary.workflow_id);
+
+  // Refresh history sidebar
+  loadHistory();
+}
+
+// ── Resolution table ──────────────────────────────────────────────────
+async function loadResolutions(workflowId) {
+  if (!workflowId) return;
+  try {
+    const res = await fetch(`${API}/status/${workflowId}`);
+    if (!res.ok) return;
+    const record = await res.json();
+
+    // Fetch actual resolution rows from DB via a dedicated query
+    // For demo: we rebuild from step data + workflow record
+    // A real implementation would have GET /api/resolutions/{workflow_id}
+    // For now, show the workflow summary card
+    renderWorkflowSummaryCard(record);
+  } catch(e) { console.warn('Load resolutions failed:', e); }
+}
+
+function renderWorkflowSummaryCard(record) {
+  const body    = document.getElementById('resolution-body');
+  const isEmpty = document.getElementById('res-empty');
+  if (isEmpty) isEmpty.remove();
+
+  const statusClass = {
+    complete:        'resolved',
+    human_review:    'human-review',
+    budget_exceeded: 'budget-cap',
+  }[record.status] || 'resolved';
+
+  const badgeHtml = record.requires_human_review
+    ? `<span class="res-badge badge-review">⚠ HUMAN REVIEW</span>`
+    : record.status === 'budget_exceeded'
+    ? `<span class="res-badge badge-guardrail">■ BUDGET CAP</span>`
+    : `<span class="res-badge badge-resolved">✓ RESOLVED</span>`;
+
+  const guardrailHtml = record.guardrail_event
+    ? `<div class="res-detail-item" style="grid-column:1/-1;margin-top:4px;">
+         <span class="res-detail-key">Guardrail</span>
+         <span class="res-detail-val" style="color:var(--amber);font-size:10px;">${escHtml(record.guardrail_event)}</span>
+       </div>` : '';
+
+  body.insertAdjacentHTML('beforeend', `
+    <div class="res-card ${statusClass}">
+      <div class="res-card-top">
+        <span class="res-pax">${escHtml(record.flight_num)} — Scenario ${escHtml(record.scenario)}</span>
+      </div>
+      <div class="res-details">
+        <div class="res-detail-item">
+          <span class="res-detail-key">Resolved</span>
+          <span class="res-detail-val">${record.passengers_resolved} pax</span>
+        </div>
+        <div class="res-detail-item">
+          <span class="res-detail-key">Total Cost</span>
+          <span class="res-detail-val">$${(record.total_cost_usd||0).toFixed(6)}</span>
+        </div>
+        <div class="res-detail-item">
+          <span class="res-detail-key">Tokens</span>
+          <span class="res-detail-val">${record.total_tokens||0}</span>
+        </div>
+        <div class="res-detail-item">
+          <span class="res-detail-key">Status</span>
+          <span class="res-detail-val">${escHtml(record.status)}</span>
+        </div>
+        ${guardrailHtml}
+      </div>
+      ${badgeHtml}
+    </div>`);
+
+  resolutionCount++;
+  document.getElementById('res-count').textContent = `${resolutionCount} workflow${resolutionCount !== 1 ? 's' : ''}`;
+}
+
+// ── Chat ──────────────────────────────────────────────────────────────
+async function sendChat() {
+  if (chatStreaming) return;
+  const input   = document.getElementById('chat-input');
+  const message = input.value.trim();
+  if (!message) return;
+
+  appendChatMsg('user', message);
+  chatHistory.push({ role: 'user', content: message });
+  input.value = '';
+  chatStreaming = true;
+  document.getElementById('chat-send-btn').disabled = true;
+
+  // Streaming assistant message placeholder — flashing thinking dots
+  const msgId  = 'cm-' + Date.now();
+  const msgs   = document.getElementById('chat-messages');
+  msgs.insertAdjacentHTML('beforeend',
+    `<div class="chat-msg assistant" id="${msgId}"><span class="thinking-dots"><span></span><span></span><span></span></span></div>`);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  let fullText = '';
+
+  try {
+    const res = await fetch(`${API}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message,
+        session_id:           conciergeSessionId,
+        conversation_history: chatHistory.slice(-8),
+      }),
+    });
+
+    const reader = res.body.getReader();
+    const dec    = new TextDecoder();
+    let   buf    = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (raw === '[DONE]') break;
+
+        try {
+          const evt = JSON.parse(raw);
+          const el  = document.getElementById(msgId);
+
+          if (evt.type === 'guardrail_block') {
+            el.className = 'chat-msg guardrail';
+            el.textContent = `⛔ GUARDRAIL BLOCK [${evt.topic || 'prompt_injection'}] — ${evt.message}`;
+            break;
+          }
+          if (evt.type === 'token' && el) {
+            fullText += evt.text;
+            el.textContent = fullText;
+            msgs.scrollTop = msgs.scrollHeight;
+          }
+          if (evt.type === 'human_review' && el) {
+            el.insertAdjacentHTML('beforeend',
+              `<br><span class="res-badge badge-review" style="margin-top:6px;">⚠ ESCALATED TO HUMAN AGENT</span>`);
+          }
+          if (evt.type === 'complete') {
+            chatSessionCost += evt.cost_usd || 0;
+            updateCostBar();
+          }
+          if (evt.type === 'custom_workflow_triggered') {
+            onCustomWorkflowTriggered(evt);
+          }
+        } catch(e) {}
+      }
+    }
+
+    if (fullText) chatHistory.push({ role: 'assistant', content: fullText });
+
+  } catch(e) {
+    const el = document.getElementById(msgId);
+    if (el) { el.className = 'chat-msg guardrail'; el.textContent = 'Connection error. Please retry.'; }
+  } finally {
+    chatStreaming = false;
+    document.getElementById('chat-send-btn').disabled = false;
+  }
+}
+
+function appendChatMsg(role, text) {
+  const msgs = document.getElementById('chat-messages');
+  msgs.insertAdjacentHTML('beforeend',
+    `<div class="chat-msg ${role}">${escHtml(text)}</div>`);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── Cost UI ───────────────────────────────────────────────────────────
+let _lastWorkflowRunCost = 0;  // most recent live workflow cumulative cost
+
+function updateCostUI(step) {
+  _lastWorkflowRunCost = step.cumulative_cost_usd || 0;
+  document.getElementById('cost-total').textContent =
+    '$' + (sessionBaseCost + _lastWorkflowRunCost + chatSessionCost).toFixed(6);
+  updateCostBar();
+}
+
+function updateCostBar() {
+  const cap = 0.10;
+  const pct = Math.min((_lastWorkflowRunCost + chatSessionCost) / cap * 100, 100);
+  const bar = document.getElementById('cost-bar');
+  bar.style.width = pct + '%';
+  bar.classList.toggle('danger', pct >= 80);
+  document.getElementById('cost-total').textContent =
+    '$' + (sessionBaseCost + _lastWorkflowRunCost + chatSessionCost).toFixed(6);
+}
+
+// ── UI helpers ────────────────────────────────────────────────────────
+function resetTraceUI() {
+  const body = document.getElementById('trace-body');
+  body.innerHTML = '<div class="trace-empty" id="trace-empty"><div class="trace-empty-icon">◎</div><div class="trace-empty-text">WORKFLOW STARTING...</div></div>';
+  document.getElementById('workflow-id-display').textContent = '—';
+}
+
+function resetRunBar() {
+  // Reset only the per-run progress bar; session totals are preserved
+  document.getElementById('cost-bar').style.width = '0%';
+  document.getElementById('cost-bar').classList.remove('danger');
+}
+
+function resetResolutionUI() {
+  resolutionCount = 0;
+  document.getElementById('resolution-body').innerHTML =
+    '<div class="resolution-empty" id="res-empty">AWAITING WORKFLOW</div>';
+  document.getElementById('res-count').textContent = '0 passengers';
+}
+
+function setWorkflowStatus(type, label) {
+  const el = document.getElementById('workflow-status');
+  el.className = 'status-badge status-' + type;
+  el.textContent = label;
+}
+
+function setScenarioBtnState(scenario, state) {
+  const btn = document.getElementById('btn-' + scenario);
+  if (!btn) return;
+  btn.classList.remove('running', 'complete', 'error');
+  if (state !== 'idle') btn.classList.add(state);
+}
+
+function appendTraceError(msg) {
+  document.getElementById('trace-empty').style.display = 'none';
+  const body = document.getElementById('trace-body');
+  body.insertAdjacentHTML('beforeend',
+    `<div style="padding:12px 36px;font-family:var(--mono);font-size:11px;color:var(--red);">✗ ${escHtml(msg)}</div>`);
+}
+
+function sendSampleQ(el) {
+  if (chatStreaming) return;
+  const input = document.getElementById('chat-input');
+  input.value = el.textContent;
+  sendChat();
+}
+
+function onCustomWorkflowTriggered(evt) {
+  if (activeEventSource) { activeEventSource.close(); activeEventSource = null; }
+  activeWorkflowId = evt.workflow_id;
+  document.getElementById('workflow-id-display').textContent = evt.workflow_id;
+  resetTraceUI();
+  resetRunBar();
+  resetResolutionUI();
+  setWorkflowStatus('running', 'RUNNING');
+  connectWorkflowStream(evt.workflow_id, 'CUSTOM');
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── History sidebar ───────────────────────────────────────────────────
+async function loadHistory() {
+  try {
+    const res = await fetch(`${API}/history`);
+    if (!res.ok) return;
+    const records = await res.json();
+    renderHistoryList(records);
+  } catch(e) { /* silent — history is non-critical */ }
+}
+
+function renderHistoryList(records) {
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+
+  if (!records.length) {
+    list.innerHTML = '<div class="history-empty">NO HISTORY YET</div>';
+    return;
+  }
+
+  // API returns newest-first (ORDER BY created_at DESC)
+  records.forEach(r => {
+    const statusLabel = {
+      complete:        ['COMPLETE', 'complete'],
+      human_review:    ['REVIEW',   'review'],
+      budget_exceeded: ['BUDGET',   'error'],
+      guardrail_halt:  ['HALT',     'error'],
+    }[r.status] || [r.status.toUpperCase(), 'error'];
+
+    const ts = r.completed_at
+      ? new Date(r.completed_at).toLocaleString('en-AU', {
+          month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', hour12:false,
+        })
+      : '—';
+
+    const card = document.createElement('div');
+    card.className = 'history-card';
+    card.innerHTML = `
+      <div class="history-card-top">
+        <span class="history-scn-badge">SCN-${escHtml(r.scenario)} · ${escHtml(r.flight_num)}</span>
+        <span class="history-status ${statusLabel[1]}">${statusLabel[0]}</span>
+      </div>
+      <div class="history-card-meta">
+        <span>$${(r.total_cost_usd||0).toFixed(6)}</span>
+        <span>${escHtml(ts)}</span>
+      </div>`;
+    card.addEventListener('click', () => replayHistory(r.workflow_id, r.scenario));
+    list.appendChild(card);
+  });
+}
+
+async function replayHistory(workflowId, scenario) {
+  if (activeEventSource) { activeEventSource.close(); activeEventSource = null; }
+
+  resetTraceUI();
+  resetRunBar();
+  resetResolutionUI();
+  document.getElementById('workflow-id-display').textContent = workflowId;
+  setWorkflowStatus('idle', 'HISTORICAL');
+
+  try {
+    const res = await fetch(`${API}/history/${workflowId}`);
+    if (!res.ok) { appendTraceError('Failed to load history record.'); return; }
+    const record = await res.json();
+
+    document.getElementById('trace-empty').style.display = 'none';
+
+    (record.steps || []).forEach(step => handleWorkflowStep(step, scenario));
+
+    // Show summary without re-fetching
+    renderWorkflowSummaryCard(record);
+    setWorkflowStatus('idle', 'HISTORICAL');
+
+    // Keep session aggregate cost displayed (don't overwrite with historical record's isolated cost)
+  } catch(e) {
+    appendTraceError(`History load error: ${e.message}`);
+  }
+}
+
+// ── Clock ─────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('live-clock').textContent = now.toLocaleTimeString([], {
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false,
+    timeZoneName: 'short',
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  });
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Load history on page init
+loadHistory();
+
+// ── Instance availability check ───────────────────────────────────────
+(async function checkInstanceStatus() {
+  const bar  = document.getElementById('avail-bar');
+  const text = document.getElementById('avail-text');
+  try {
+    const res  = await fetch(`${API}/instance-status`);
+    const data = await res.json();
+    bar.classList.add('online');
+    const id = data.instance_id ? '…' + data.instance_id.slice(-8) : 'EC2';
+    text.textContent = id + ' · ONLINE';
+  } catch {
+    bar.classList.remove('online');
+    text.textContent = 'INSTANCE UNREACHABLE';
+  }
+})();
+</script>
+</body>
+</html>
