@@ -2912,7 +2912,25 @@ function connectWorkflowStream(workflowId, scenario) {
   es.onerror = () => {
     es.close();
     activeEventSource = null;
+    // SSE dropped (e.g. CloudFront timeout) — poll for final state
+    if (activeWorkflowId === workflowId) {
+      pollForWorkflowCompletion(workflowId, scenario);
+    }
   };
+}
+
+async function pollForWorkflowCompletion(workflowId, scenario) {
+  for (let i = 0; i < 10; i++) {
+    await new Promise(r => setTimeout(r, 3000));
+    try {
+      const res  = await fetch(`${API}/status/${workflowId}`);
+      const data = await res.json();
+      if (data.status && data.status !== 'running') {
+        handleWorkflowComplete(data, scenario);
+        return;
+      }
+    } catch {}
+  }
 }
 
 function handleWorkflowStep(step, scenario) {
@@ -3375,21 +3393,22 @@ setInterval(updateClock, 1000);
 // Load history on page init
 loadHistory();
 
-// ── Instance availability check ───────────────────────────────────────
-(async function checkInstanceStatus() {
+// ── Instance availability check (polls every 30s) ─────────────────────
+async function checkInstanceStatus() {
   const bar  = document.getElementById('avail-bar');
   const text = document.getElementById('avail-text');
   try {
     const res  = await fetch(`${API}/instance-status`);
     const data = await res.json();
     bar.classList.add('online');
-    const id = data.instance_id ? '…' + data.instance_id.slice(-8) : 'AGENT';
-    text.textContent = id + ' · ONLINE';
+    text.textContent = 'AGENT ONLINE';
   } catch {
     bar.classList.remove('online');
-    text.textContent = 'INSTANCE UNREACHABLE';
+    text.textContent = 'AGENT OFFLINE';
   }
-})();
+  setTimeout(checkInstanceStatus, 30000);
+}
+checkInstanceStatus();
 </script>
 </body>
 </html>

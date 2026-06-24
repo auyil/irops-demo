@@ -83,6 +83,7 @@ irops-demo/
 ```bash
 BEDROCK_GUARDRAIL_ID=<GuardrailId>
 BEDROCK_GUARDRAIL_VERSION=1
+EC2_INSTANCE_ID=<InstanceId>
 ```
 
 Do NOT commit `.env` — it is in `.gitignore`.

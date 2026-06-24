@@ -30,7 +30,6 @@ build/
 .docker/
 # Ignore locally generated container data or databases if mapped locally
 data/
-db/
 *.db
 *.sqlite3
 

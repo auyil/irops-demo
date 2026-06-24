@@ -116,13 +116,35 @@ async def _sse_generator(
     Wrap an async dict generator into SSE-formatted text chunks.
     Each event: "data: {json}\n\n"
     Final event: "data: [DONE]\n\n"
+
+    Sends SSE comment keepalives every 25s so CloudFront does not close
+    the connection on its origin response timeout (default 60s).
     """
+    _KEEPALIVE_INTERVAL = 25.0
+    buf: asyncio.Queue = asyncio.Queue()
+
+    async def _drain():
+        try:
+            async for event in generator:
+                await buf.put(event)
+        finally:
+            await buf.put(None)  # sentinel
+
+    task = asyncio.create_task(_drain())
     try:
-        async for event in generator:
+        while True:
+            try:
+                event = await asyncio.wait_for(buf.get(), timeout=_KEEPALIVE_INTERVAL)
+            except asyncio.TimeoutError:
+                yield ": keepalive\n\n"
+                continue
+            if event is None:
+                break
             yield f"data: {json.dumps(event)}\n\n"
     except asyncio.CancelledError:
-        pass
+        task.cancel()
     finally:
+        task.cancel()
         yield "data: [DONE]\n\n"
 
 
